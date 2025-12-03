@@ -10,6 +10,7 @@ import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/rounded_button.dart';
+import '../../../routes.dart';
 import '../bloc/registration_bloc.dart';
 import '../bloc/registration_event.dart';
 
@@ -375,9 +376,13 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
       'knownLanguages': _selectedLanguages,
     };
 
+    // Dispatch the event to update the state
     BlocProvider.of<RegistrationBloc>(
       context,
     ).add(PersonalDetailsUpdated(details));
+
+    // Navigate to the next screen
+    Navigator.of(context).pushNamed(Routes.religion);
   }
 
   Widget _buildSectionTitle(String title) {
@@ -424,7 +429,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                   hintStyle: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 16.0,
-                    color: AppColors.textSecondary,
+                    color: AppColors.textSecondary.withOpacity(0.5),
                   ),
                 ),
                 style: TextStyle(
@@ -442,7 +447,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
               child: IconButton(
                 icon: Icon(
                   Icons.edit_calendar,
-                  color: AppColors.textSecondary,
+                  color: AppColors.textSecondary.withOpacity(0.5),
                   size: AppSizes.iconSizeMedium,
                 ),
                 onPressed: onTap,
@@ -485,7 +490,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       fontWeight: FontWeight.w600,
                       color: value != null
                           ? AppColors.textPrimary
-                          : AppColors.textSecondary.withOpacity(0.7),
+                          : AppColors.textSecondary.withOpacity(0.5),
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -594,7 +599,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     fontFamily: 'Inter',
                     fontSize: 16.0,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -713,9 +718,10 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
                       color: _selectedLanguages.isNotEmpty
                           ? AppColors.textPrimary
-                          : AppColors.textSecondary.withOpacity(0.7),
+                          : AppColors.textSecondary.withOpacity(0.5),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

@@ -33,7 +33,7 @@ class RadioListItem<T> extends StatelessWidget {
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 16.0,
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w600,
             color: selected
                 ? AppColors.textPrimary  // Selected color
                 : AppColors.textSecondary, // Unselected color
