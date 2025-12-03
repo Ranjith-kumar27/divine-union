@@ -1,7 +1,7 @@
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 
 import '../../../bottomsheet/custom_bottom_sheet.dart';
 import '../../../core/constants/app_assets.dart';
@@ -117,11 +117,17 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
     return _nameController.text.isNotEmpty &&
         _dobController.text.isNotEmpty &&
         _heightController.text.isNotEmpty &&
+        _isValidHeight(_heightController.text.trim()) &&
         _selectedGender != null &&
         _selectedMaritalStatus != null &&
         _selectedLocation != null &&
         _selectedMotherTongue != null &&
         _selectedLanguages.isNotEmpty;
+  }
+
+  bool _isValidHeight(String heightText) {
+    final height = double.tryParse(heightText);
+    return height != null && height > 0;
   }
 
   void _showDatePickerBottomSheet() {
@@ -177,7 +183,9 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                   fontSize: 14.0,
                   color: AppColors.textSecondary.withOpacity(0.5),
                 ),
-                currentDate: DateTime.now().subtract(const Duration(days: 365 * 18)), // Default to 18 years ago
+                currentDate: DateTime.now().subtract(
+                  const Duration(days: 365 * 18),
+                ),
                 firstDate: DateTime(1900),
                 lastDate: DateTime.now(),
                 weekdayLabelTextStyle: TextStyle(
@@ -210,7 +218,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                   final selectedDate = dates.first!;
                   setState(() {
                     _dobController.text =
-                    '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}';
+                        '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}';
                   });
                   Navigator.pop(context);
                 }
@@ -254,7 +262,6 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
       if (month < 1 || month > 12) return false;
       if (day < 1 || day > 31) return false;
 
-      // Check for valid days in month
       final date = DateTime(year, month, day);
       return date.year == year && date.month == month && date.day == day;
     } catch (e) {
@@ -273,6 +280,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      barrierColor: AppColors.disabled.withOpacity(0.5),
       builder: (context) => CustomBottomSheet(
         title: title,
         options: options,
@@ -304,10 +312,19 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
 
   void _handleNext() {
     if (!_isValidDate(_dobController.text.trim())) {
-      // Show error if date is invalid
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please enter a valid date (dd/mm/yyyy)'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (!_isValidHeight(_heightController.text.trim())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please enter a valid height'),
           backgroundColor: Colors.red,
         ),
       );
@@ -328,7 +345,6 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
     BlocProvider.of<RegistrationBloc>(
       context,
     ).add(PersonalDetailsUpdated(details));
-    // Navigator.of(context).pushNamed(Routes.religion);
   }
 
   Widget _buildSectionTitle(String title) {
@@ -361,40 +377,44 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
       ),
       child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          ),
           Expanded(
-            child: TextField(
-              controller: controller,
-              onTap: onTap,
-              readOnly: readOnly,
-              keyboardType: readOnly ? null : TextInputType.datetime, // Allow typing for date
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: hint,
-                hintStyle: TextStyle(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                controller: controller,
+                onTap: onTap,
+                readOnly: readOnly,
+                keyboardType: readOnly ? null : TextInputType.datetime,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: hint,
+                  hintStyle: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 16.0,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16.0,
-                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
                 ),
-              ),
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
               ),
             ),
           ),
           if (onTap != null)
-            IconButton(
-              icon: Icon(
-                Icons.edit_calendar,
-                color: AppColors.textSecondary,
-                size: AppSizes.iconSizeMedium,
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: IconButton(
+                icon: Icon(
+                  Icons.edit_calendar,
+                  color: AppColors.textSecondary,
+                  size: AppSizes.iconSizeMedium,
+                ),
+                onPressed: onTap,
+                padding: EdgeInsets.zero,
               ),
-              onPressed: onTap,
             ),
         ],
       ),
@@ -420,12 +440,11 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
               borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
               border: Border.all(color: AppColors.border),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
                     value ?? hint,
                     style: TextStyle(
                       fontFamily: 'Inter',
@@ -434,14 +453,15 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                           ? AppColors.textPrimary
                           : AppColors.textSecondary.withOpacity(0.7),
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  Icon(
-                    Icons.arrow_drop_down,
-                    color: AppColors.textSecondary,
-                    size: AppSizes.iconSizeLarge,
-                  ),
-                ],
-              ),
+                ),
+                IconButton(
+                  icon: SvgPicture.asset(AppAssets.arrowDown),
+                  padding: const EdgeInsets.all(8.0),
+                  onPressed: onTap,
+                ),
+              ],
             ),
           ),
         ),
@@ -459,7 +479,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
             final isSelected = _selectedGender == gender;
             return Expanded(
               child: Padding(
-                padding: const EdgeInsets.only(right: 8.0),
+                padding: const EdgeInsets.only(right: 28.0),
                 child: GestureDetector(
                   onTap: () {
                     setState(() {
@@ -480,24 +500,121 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                         width: isSelected ? 2.0 : 1.0,
                       ),
                     ),
-                    child: Center(
-                      child: Text(
-                        gender,
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(width: 18.0),
+                        Icon(
+                          gender == 'Male' ? Icons.male : Icons.female,
                           color: isSelected
                               ? AppColors.primary
-                              : AppColors.textPrimary,
+                              : AppColors.textSecondary,
+                          size: AppSizes.iconSizeMedium,
                         ),
-                      ),
+                        const SizedBox(width: 8.0),
+                        Text(
+                          gender,
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                            color: isSelected
+                                ? AppColors
+                                      .primary // Changed to primary color when selected
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
             );
           }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeightField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Height'),
+        Row(
+          children: [
+            Container(
+              height: AppSizes.fieldHeight,
+              width: 60,
+              decoration: BoxDecoration(
+                color: AppColors.fieldBackground,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(AppSizes.fieldRadius),
+                  bottomLeft: Radius.circular(AppSizes.fieldRadius),
+                ),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Center(
+                child: Text(
+                  'ft',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                height: AppSizes.fieldHeight,
+                decoration: BoxDecoration(
+                  color: AppColors.fieldBackground,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(AppSizes.fieldRadius),
+                    bottomRight: Radius.circular(AppSizes.fieldRadius),
+                  ),
+                  border: Border(
+                    top: BorderSide(color: AppColors.border),
+                    right: BorderSide(color: AppColors.border),
+                    bottom: BorderSide(color: AppColors.border),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _heightController,
+                          keyboardType: TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: '',
+                            hintStyle: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 16.0,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -535,6 +652,66 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
           );
         }).toList(),
       ),
+    );
+  }
+
+  Widget _buildKnownLanguagesField() {
+    void _openKnownLanguagesSheet() {
+      _showMultiSelectionBottomSheet(
+        title: 'Known Languages',
+        options: _languageOptions,
+        selectedValues: _selectedLanguages,
+        onSelect: (values) {
+          setState(() {
+            _selectedLanguages = values;
+          });
+        },
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Known languages'),
+        GestureDetector(
+          onTap: _openKnownLanguagesSheet,
+          child: Container(
+            height: AppSizes.fieldHeight,
+            decoration: BoxDecoration(
+              color: AppColors.fieldBackground,
+              borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
+              border: Border.all(color: AppColors.border),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _selectedLanguages.isNotEmpty
+                        ? _selectedLanguages.join(', ')
+                        : 'Select',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 16.0,
+                      color: _selectedLanguages.isNotEmpty
+                          ? AppColors.textPrimary
+                          : AppColors.textSecondary.withOpacity(0.7),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  icon: SvgPicture.asset(AppAssets.arrowDown),
+                  onPressed: _openKnownLanguagesSheet,
+                  padding: const EdgeInsets.all(8.0),
+                ),
+              ],
+            ),
+          ),
+        ),
+        _buildLanguageChips(),
+      ],
     );
   }
 
@@ -579,44 +756,31 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: AppSizes.screenTopSpacing),
-              // Heading
               Text(
                 "Let's begin with you! Tell us a bit about yourself.",
                 style: AppTextStyles.heading(context),
               ),
               const SizedBox(height: AppSizes.largeSpacing),
 
-              // Name Field
               _buildSectionTitle('Name'),
-              _buildTextField(
-                hint: 'Type here',
-                controller: _nameController,
-              ),
+              _buildTextField(hint: 'Type here', controller: _nameController),
               const SizedBox(height: AppSizes.largeSpacing),
 
-              // Date of Birth Field
               _buildSectionTitle('Date of Birth'),
               _buildTextField(
                 hint: 'dd/mm/yyyy',
                 controller: _dobController,
                 onTap: _showDatePickerBottomSheet,
-                readOnly: false, // Changed to false to allow typing
+                readOnly: false,
               ),
               const SizedBox(height: AppSizes.largeSpacing),
 
-              // Height Field
-              _buildSectionTitle('Height'),
-              _buildTextField(
-                hint: 'ft',
-                controller: _heightController,
-              ),
+              _buildHeightField(),
               const SizedBox(height: AppSizes.largeSpacing),
 
-              // Gender Selection
               _buildGenderSelection(),
               const SizedBox(height: AppSizes.largeSpacing),
 
-              // Marital Status
               _buildSelectionField(
                 title: 'Marital status',
                 value: _selectedMaritalStatus,
@@ -634,7 +798,6 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
               ),
               const SizedBox(height: AppSizes.largeSpacing),
 
-              // Current Location
               _buildSelectionField(
                 title: 'Current location',
                 value: _selectedLocation,
@@ -653,7 +816,6 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
               ),
               const SizedBox(height: AppSizes.largeSpacing),
 
-              // Mother Tongue
               _buildSelectionField(
                 title: 'Mother tongue',
                 value: _selectedMotherTongue,
@@ -671,66 +833,9 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
               ),
               const SizedBox(height: AppSizes.largeSpacing),
 
-              // Known Languages
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionTitle('Known languages'),
-                  GestureDetector(
-                    onTap: () => _showMultiSelectionBottomSheet(
-                      title: 'Known Languages',
-                      options: _languageOptions,
-                      selectedValues: _selectedLanguages,
-                      onSelect: (values) {
-                        setState(() {
-                          _selectedLanguages = values;
-                        });
-                      },
-                    ),
-                    child: Container(
-                      height: AppSizes.fieldHeight,
-                      decoration: BoxDecoration(
-                        color: AppColors.fieldBackground,
-                        borderRadius: BorderRadius.circular(
-                          AppSizes.fieldRadius,
-                        ),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              _selectedLanguages.isNotEmpty
-                                  ? _selectedLanguages.join(', ')
-                                  : 'Select',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontSize: 16.0,
-                                color: _selectedLanguages.isNotEmpty
-                                    ? AppColors.textPrimary
-                                    : AppColors.textSecondary.withOpacity(0.7),
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Icon(
-                              Icons.arrow_drop_down,
-                              color: AppColors.textSecondary,
-                              size: AppSizes.iconSizeLarge,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  _buildLanguageChips(),
-                ],
-              ),
+              _buildKnownLanguagesField(),
               const SizedBox(height: AppSizes.largeSpacing),
 
-              // Next Button - Fixed parameters
               RoundedButton(
                 label: AppStrings.next,
                 onPressed: _isFormValid ? _handleNext : null,
