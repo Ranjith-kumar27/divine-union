@@ -269,43 +269,76 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
     }
   }
 
-  void _showSelectionBottomSheet({
-    required String title,
-    required List<String> options,
-    required String? selectedValue,
-    required Function(String) onSelect,
-    bool showSearch = false,
-  }) {
+  void _showMaritalStatusBottomSheet() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: AppColors.disabled.withOpacity(0.5),
-      builder: (context) => CustomBottomSheet(
-        title: title,
-        options: options,
-        selectedValue: selectedValue,
-        onSelect: onSelect,
-        showSearch: showSearch,
+      builder: (context) => CustomBottomSheet.maritalStatus(
+        selectedValue: _selectedMaritalStatus,
+        onSelect: (value) {
+          setState(() {
+            _selectedMaritalStatus = value;
+          });
+        },
       ),
     );
   }
 
-  void _showMultiSelectionBottomSheet({
-    required String title,
-    required List<String> options,
-    required List<String> selectedValues,
-    required Function(List<String>) onSelect,
-  }) {
+  void _showLocationBottomSheet() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => CustomBottomSheet.multiSelect(
-        title: title,
-        options: options,
-        selectedValues: selectedValues,
-        onSelect: onSelect,
+      barrierColor: AppColors.disabled.withOpacity(0.5),
+      builder: (context) => CustomBottomSheet.citySelection(
+        options: _locationOptions,
+        selectedValue: _selectedLocation,
+        // Changed from selectedValues to selectedValue
+        onSelect: (selected) {
+          // Changed from onSelect to accept String instead of List<String>
+          setState(() {
+            _selectedLocation = selected;
+          });
+        },
+      ),
+    );
+  }
+
+  void _showMotherTongueBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: AppColors.disabled.withOpacity(0.5),
+      builder: (context) => CustomBottomSheet.motherTongue(
+        options: _motherTongueOptions,
+        selectedValue: _selectedMotherTongue,
+        // Changed from selectedValues to selectedValue
+        onSelect: (selected) {
+          // Changed from onSelect to accept String instead of List<String>
+          setState(() {
+            _selectedMotherTongue = selected;
+          });
+        },
+      ),
+    );
+  }
+
+  void _showKnownLanguagesBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CustomBottomSheet.knownLanguages(
+        options: _languageOptions,
+        selectedValues: _selectedLanguages,
+        onSelect: (values) {
+          setState(() {
+            _selectedLanguages = values;
+          });
+        },
       ),
     );
   }
@@ -449,6 +482,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
                       color: value != null
                           ? AppColors.textPrimary
                           : AppColors.textSecondary.withOpacity(0.7),
@@ -519,8 +553,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                             fontSize: 16.0,
                             fontWeight: FontWeight.w500,
                             color: isSelected
-                                ? AppColors
-                                      .primary // Changed to primary color when selected
+                                ? AppColors.primary
                                 : AppColors.textSecondary,
                           ),
                         ),
@@ -656,25 +689,12 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   }
 
   Widget _buildKnownLanguagesField() {
-    void _openKnownLanguagesSheet() {
-      _showMultiSelectionBottomSheet(
-        title: 'Known Languages',
-        options: _languageOptions,
-        selectedValues: _selectedLanguages,
-        onSelect: (values) {
-          setState(() {
-            _selectedLanguages = values;
-          });
-        },
-      );
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('Known languages'),
         GestureDetector(
-          onTap: _openKnownLanguagesSheet,
+          onTap: _showKnownLanguagesBottomSheet,
           child: Container(
             height: AppSizes.fieldHeight,
             decoration: BoxDecoration(
@@ -703,7 +723,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                 ),
                 IconButton(
                   icon: SvgPicture.asset(AppAssets.arrowDown),
-                  onPressed: _openKnownLanguagesSheet,
+                  onPressed: _showKnownLanguagesBottomSheet,
                   padding: const EdgeInsets.all(8.0),
                 ),
               ],
@@ -785,16 +805,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                 title: 'Marital status',
                 value: _selectedMaritalStatus,
                 hint: 'Select',
-                onTap: () => _showSelectionBottomSheet(
-                  title: 'Marital Status',
-                  options: _maritalOptions,
-                  selectedValue: _selectedMaritalStatus,
-                  onSelect: (value) {
-                    setState(() {
-                      _selectedMaritalStatus = value;
-                    });
-                  },
-                ),
+                onTap: _showMaritalStatusBottomSheet,
               ),
               const SizedBox(height: AppSizes.largeSpacing),
 
@@ -802,17 +813,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                 title: 'Current location',
                 value: _selectedLocation,
                 hint: 'Select',
-                onTap: () => _showSelectionBottomSheet(
-                  title: 'Select City',
-                  options: _locationOptions,
-                  selectedValue: _selectedLocation,
-                  onSelect: (value) {
-                    setState(() {
-                      _selectedLocation = value;
-                    });
-                  },
-                  showSearch: true,
-                ),
+                onTap: _showLocationBottomSheet,
               ),
               const SizedBox(height: AppSizes.largeSpacing),
 
@@ -820,16 +821,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                 title: 'Mother tongue',
                 value: _selectedMotherTongue,
                 hint: 'Select',
-                onTap: () => _showSelectionBottomSheet(
-                  title: 'Mother Tongue',
-                  options: _motherTongueOptions,
-                  selectedValue: _selectedMotherTongue,
-                  onSelect: (value) {
-                    setState(() {
-                      _selectedMotherTongue = value;
-                    });
-                  },
-                ),
+                onTap: _showMotherTongueBottomSheet,
               ),
               const SizedBox(height: AppSizes.largeSpacing),
 

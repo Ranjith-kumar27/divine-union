@@ -28,9 +28,9 @@ class RoundedButton extends StatelessWidget {
     this.width,
     this.backgroundColor,
     this.disabledColor,
-    this.textColor, // Added
-    this.height, // Added
-    this.borderRadius, // Added
+    this.textColor,
+    this.height,
+    this.borderRadius,
   });
 
   @override
@@ -38,6 +38,9 @@ class RoundedButton extends StatelessWidget {
     final buttonHeight = height ?? AppSizes.buttonHeight;
     final buttonRadius = borderRadius ?? AppSizes.buttonRadius;
     final buttonTextColor = textColor ?? Colors.white;
+
+    // Use custom disabledColor if provided, otherwise use AppColors.disabled
+    final actualDisabledColor = disabledColor ?? AppColors.disabled;
 
     return SizedBox(
       height: buttonHeight,
@@ -47,18 +50,21 @@ class RoundedButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: isEnabled
               ? (backgroundColor ?? AppColors.primary)
-              : (disabledColor ?? AppColors.disabled),
+              : actualDisabledColor,
           foregroundColor: buttonTextColor,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(buttonRadius),
           ),
+          // Ensure disabled text color is also white
+          disabledBackgroundColor: actualDisabledColor,
+          disabledForegroundColor: Colors.white,
         ),
         child: Text(
           label,
           style: AppTextStyles.buttonLabel(
             context,
-          ).copyWith(color: isEnabled ? buttonTextColor : Colors.grey.shade400),
+          ).copyWith(color: isEnabled ? buttonTextColor : Colors.white),
         ),
       ),
     );

@@ -9,6 +9,8 @@ class CustomBottomSheet extends StatefulWidget {
   final String? selectedValue;
   final Function(String) onSelect;
   final bool showSearch;
+  final double heightFactor; // Added: controls height relative to screen
+  final bool isSingleSelect;
 
   const CustomBottomSheet({
     super.key,
@@ -17,7 +19,29 @@ class CustomBottomSheet extends StatefulWidget {
     this.selectedValue,
     required this.onSelect,
     this.showSearch = false,
+    this.heightFactor = 0.5,
+    this.isSingleSelect = true,
   });
+
+  // Factory constructors for different use cases
+  factory CustomBottomSheet.singleSelect({
+    required String title,
+    required List<String> options,
+    String? selectedValue,
+    required Function(String) onSelect,
+    bool showSearch = false,
+    double heightFactor = 0.5,
+  }) {
+    return CustomBottomSheet(
+      title: title,
+      options: options,
+      selectedValue: selectedValue,
+      onSelect: onSelect,
+      showSearch: showSearch,
+      heightFactor: heightFactor,
+      isSingleSelect: true,
+    );
+  }
 
   factory CustomBottomSheet.multiSelect({
     required String title,
@@ -25,6 +49,7 @@ class CustomBottomSheet extends StatefulWidget {
     required List<String> selectedValues,
     required Function(List<String>) onSelect,
     bool showSearch = false,
+    double heightFactor = 0.8,
   }) {
     return _MultiSelectBottomSheet(
       title: title,
@@ -32,6 +57,67 @@ class CustomBottomSheet extends StatefulWidget {
       selectedValues: selectedValues,
       onMultiSelect: onSelect,
       showSearch: showSearch,
+      heightFactor: heightFactor,
+    );
+  }
+
+  // Convenience constructors for specific use cases
+  factory CustomBottomSheet.maritalStatus({
+    required String? selectedValue,
+    required Function(String) onSelect,
+  }) {
+    return CustomBottomSheet.singleSelect(
+      title: 'Marital Status',
+      options: ['Single', 'Married', 'Divorced', 'Widowed'],
+      selectedValue: selectedValue,
+      onSelect: onSelect,
+      showSearch: false,
+      heightFactor: 0.5,
+    );
+  }
+
+  factory CustomBottomSheet.citySelection({
+    required List<String> options,
+    required String? selectedValue,
+    required Function(String) onSelect,
+  }) {
+    return CustomBottomSheet.singleSelect(
+      title: 'Select City',
+      options: options,
+      selectedValue: selectedValue,
+      onSelect: onSelect,
+      showSearch: true,
+      heightFactor: 0.7,
+    );
+  }
+
+  factory CustomBottomSheet.knownLanguages({
+    required List<String> options,
+    required List<String> selectedValues,
+    required Function(List<String>) onSelect,
+  }) {
+    return CustomBottomSheet.multiSelect(
+      title: 'Known Languages',
+      options: options,
+      selectedValues: selectedValues,
+      onSelect: onSelect,
+      showSearch: true,
+      heightFactor: 0.8,
+    );
+  }
+
+  factory CustomBottomSheet.motherTongue({
+    required List<String> options,
+    required String? selectedValue,
+    required Function(String) onSelect,
+  }) {
+    return CustomBottomSheet.singleSelect(
+      title: 'Mother Tongue',
+      options: options,
+      selectedValue: selectedValue,
+      onSelect: onSelect,
+      showSearch: true,
+      heightFactor: 0.7,
     );
   }
 
@@ -68,12 +154,9 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return BackdropFilter(
-      filter: ColorFilter.mode(
-        Colors.black.withOpacity(0.5), // Adjust opacity for blur effect
-        BlendMode.darken,
-      ),
+      filter: ColorFilter.mode(Colors.black.withOpacity(0.8), BlendMode.darken),
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.5, // Fixed height
+        height: MediaQuery.of(context).size.height * widget.heightFactor,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.only(
@@ -91,22 +174,27 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Draggable indicator at the top center
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.16,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            ),
+
             // Header
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Center(
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.16,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppColors.border,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 8.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -136,7 +224,9 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                       height: AppSizes.fieldHeight,
                       decoration: BoxDecoration(
                         color: AppColors.fieldBackground,
-                        borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
+                        borderRadius: BorderRadius.circular(
+                          AppSizes.fieldRadius,
+                        ),
                         border: Border.all(color: AppColors.border),
                       ),
                       child: Row(
@@ -154,7 +244,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                               controller: _searchController,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
-                                hintText: 'Search your city',
+                                hintText: 'Search',
                                 hintStyle: TextStyle(
                                   fontFamily: 'Inter',
                                   fontSize: 16.0,
@@ -181,138 +271,92 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
             Expanded(
               child: _filteredOptions.isEmpty
                   ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text(
-                    'No results found',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 16.0,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-              )
-                  : ListView.builder(
-                padding: const EdgeInsets.all(8.0),
-                itemCount: _filteredOptions.length,
-                itemBuilder: (context, index) {
-                  final option = _filteredOptions[index];
-                  final isSelected = widget.selectedValue == option;
-
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: index == 0
-                            ? BorderSide.none
-                            : BorderSide(color: AppColors.border, width: 0.5),
-                        bottom: BorderSide(color: AppColors.border, width: 0.5),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                        vertical: 4.0,
-                      ),
-                      child: Material(
-                        color: isSelected
-                            ? AppColors.liteDisabled
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                            vertical: 12.0,
-                          ),
-                          title: Text(
-                            option,
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400,
-                              color: isSelected
-                                  ? AppColors.textPrimary  // Selected - text primary color
-                                  : AppColors.textSecondary, // Unselected - muted color
-                            ),
-                          ),
-                          trailing: DesignRadioButton<String>(
-                            value: option,
-                            groupValue: widget.selectedValue,
-                            onChanged: (value) {
-                              if (value != null) {
-                                widget.onSelect(value);
-                                Navigator.pop(context);
-                              }
-                            },
-                            size: 24.0,
-                          ),
-                          onTap: () {
-                            widget.onSelect(option);
-                            Navigator.pop(context);
-                          },
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(
+                          'No results found',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 16.0,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(8.0),
+                      itemCount: _filteredOptions.length,
+                      itemBuilder: (context, index) {
+                        final option = _filteredOptions[index];
+                        final isSelected = widget.selectedValue == option;
+
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              top: index == 0
+                                  ? BorderSide.none
+                                  : BorderSide(
+                                      color: AppColors.border,
+                                      width: 0.5,
+                                    ),
+                              bottom: BorderSide(
+                                color: AppColors.border,
+                                width: 0.5,
+                              ),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                              vertical: 4.0,
+                            ),
+                            child: Material(
+                              color: isSelected
+                                  ? AppColors.liteDisabled
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                  vertical: 12.0,
+                                ),
+                                title: Text(
+                                  option,
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w400,
+                                    color: isSelected
+                                        ? AppColors.textPrimary
+                                        : AppColors.textSecondary,
+                                  ),
+                                ),
+                                trailing: DesignRadioButton<String>(
+                                  value: option,
+                                  groupValue: widget.selectedValue,
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      widget.onSelect(value);
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  size: 24.0,
+                                ),
+                                onTap: () {
+                                  widget.onSelect(option);
+                                  Navigator.pop(context);
+                                },
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class DesignRadioButton<T> extends StatelessWidget {
-  final T value;
-  final T? groupValue;
-  final ValueChanged<T?>? onChanged;
-  final double size;
-
-  const DesignRadioButton({
-    super.key,
-    required this.value,
-    required this.groupValue,
-    required this.onChanged,
-    this.size = 24.0,
-  });
-
-  bool get isSelected => value == groupValue;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (onChanged != null) {
-          onChanged!(value);
-        }
-      },
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: isSelected
-                ? AppColors.primary  // Primary color when selected
-                : AppColors.border,   // Border color when unselected
-            width: 2.0,
-          ),
-        ),
-        child: Center(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: isSelected ? size * 0.5 : 0,
-            height: isSelected ? size * 0.5 : 0,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isSelected ? AppColors.primary : Colors.transparent,
-            ),
-          ),
         ),
       ),
     );
@@ -329,13 +373,16 @@ class _MultiSelectBottomSheet extends CustomBottomSheet {
     required this.selectedValues,
     required this.onMultiSelect,
     bool showSearch = false,
+    double heightFactor = 0.8,
   }) : super(
-    title: title,
-    options: options,
-    selectedValue: null,
-    onSelect: (_) {},
-    showSearch: showSearch,
-  );
+         title: title,
+         options: options,
+         selectedValue: null,
+         onSelect: (_) {},
+         showSearch: showSearch,
+         heightFactor: heightFactor,
+         isSingleSelect: false,
+       );
 
   @override
   State<CustomBottomSheet> createState() => _MultiSelectBottomSheetState();
@@ -382,12 +429,9 @@ class _MultiSelectBottomSheetState extends State<_MultiSelectBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return BackdropFilter(
-      filter: ColorFilter.mode(
-        Colors.black.withOpacity(0.5), // Background blur effect
-        BlendMode.darken,
-      ),
+      filter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.darken),
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.8, // Fixed height
+        height: MediaQuery.of(context).size.height * widget.heightFactor,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.only(
@@ -405,6 +449,21 @@ class _MultiSelectBottomSheetState extends State<_MultiSelectBottomSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Draggable indicator at the top center
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.16,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            ),
+
             // Header
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -439,7 +498,9 @@ class _MultiSelectBottomSheetState extends State<_MultiSelectBottomSheet> {
                       height: AppSizes.fieldHeight,
                       decoration: BoxDecoration(
                         color: AppColors.fieldBackground,
-                        borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
+                        borderRadius: BorderRadius.circular(
+                          AppSizes.fieldRadius,
+                        ),
                         border: Border.all(color: AppColors.border),
                       ),
                       child: Row(
@@ -484,66 +545,66 @@ class _MultiSelectBottomSheetState extends State<_MultiSelectBottomSheet> {
             Expanded(
               child: _filteredOptions.isEmpty
                   ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text(
-                    'No results found',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 16.0,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-              )
-                  : ListView.builder(
-                padding: const EdgeInsets.all(8.0),
-                itemCount: _filteredOptions.length,
-                itemBuilder: (context, index) {
-                  final option = _filteredOptions[index];
-                  final isSelected = _selectedValues.contains(option);
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                      vertical: 4.0,
-                    ),
-                    child: Material(
-                      color: isSelected
-                          ? AppColors.disabled // Changed to disabled background
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 12.0,
-                        ),
-                        title: Text(
-                          option,
-                          style: const TextStyle(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(
+                          'No results found',
+                          style: TextStyle(
                             fontFamily: 'Inter',
                             fontSize: 16.0,
-                            fontWeight: FontWeight.w400,
-                            color: AppColors.textPrimary, // Set text color
+                            color: AppColors.textSecondary,
                           ),
-                        ),
-                        trailing: Checkbox(
-                          value: isSelected,
-                          onChanged: (_) => _toggleSelection(option),
-                          activeColor: AppColors.primary, // Set checkbox color
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                        ),
-                        onTap: () => _toggleSelection(option),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(8.0),
+                      itemCount: _filteredOptions.length,
+                      itemBuilder: (context, index) {
+                        final option = _filteredOptions[index];
+                        final isSelected = _selectedValues.contains(option);
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 4.0,
+                          ),
+                          child: Material(
+                            color: isSelected
+                                ? AppColors.liteDisabled
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16.0,
+                                vertical: 12.0,
+                              ),
+                              title: Text(
+                                option,
+                                style: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              trailing: Checkbox(
+                                value: isSelected,
+                                onChanged: (_) => _toggleSelection(option),
+                                activeColor: AppColors.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4.0),
+                                ),
+                              ),
+                              onTap: () => _toggleSelection(option),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
 
             // Done Button
@@ -559,7 +620,9 @@ class _MultiSelectBottomSheetState extends State<_MultiSelectBottomSheet> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSizes.buttonRadius),
+                      borderRadius: BorderRadius.circular(
+                        AppSizes.buttonRadius,
+                      ),
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     elevation: 0,
@@ -577,6 +640,56 @@ class _MultiSelectBottomSheetState extends State<_MultiSelectBottomSheet> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class DesignRadioButton<T> extends StatelessWidget {
+  final T value;
+  final T? groupValue;
+  final ValueChanged<T?>? onChanged;
+  final double size;
+
+  const DesignRadioButton({
+    super.key,
+    required this.value,
+    required this.groupValue,
+    required this.onChanged,
+    this.size = 24.0,
+  });
+
+  bool get isSelected => value == groupValue;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (onChanged != null) {
+          onChanged!(value);
+        }
+      },
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: 2.0,
+          ),
+        ),
+        child: Center(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: isSelected ? size * 0.5 : 0,
+            height: isSelected ? size * 0.5 : 0,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSelected ? AppColors.primary : Colors.transparent,
+            ),
+          ),
         ),
       ),
     );
