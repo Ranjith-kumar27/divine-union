@@ -293,12 +293,11 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: AppColors.disabled.withOpacity(0.5),
-      builder: (context) => CustomBottomSheet.citySelection(
+      builder: (context) => CustomBottomSheet.locationSelection(
+        title: 'Select City',
         options: _locationOptions,
         selectedValue: _selectedLocation,
-        // Changed from selectedValues to selectedValue
         onSelect: (selected) {
-          // Changed from onSelect to accept String instead of List<String>
           setState(() {
             _selectedLocation = selected;
           });
