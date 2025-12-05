@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/constants/app_sizes.dart';
+import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/radio_list_item.dart';
 
-class DifferencesInPartnerPage extends StatelessWidget {
+class ChildrenDesirePage extends StatelessWidget {
   final String? selectedValue;
-  final ValueChanged<String?> onSelectionChanged;
+  final ValueChanged<String?> onSelected;
 
-  const DifferencesInPartnerPage({
+  const ChildrenDesirePage({
     super.key,
     required this.selectedValue,
-    required this.onSelectionChanged,
+    required this.onSelected,
   });
 
   static const options = [
-    "I'm open to different denominational backgrounds",
-    "I'm flexible about different regional cultures",
-    "I appreciate different personality types that complement mine",
-    "I'm interested in partners from different educational backgrounds",
-    "I welcome different career paths and ambitions",
-    "I'm open to different dietary preferences",
-    "I'm comfortable with age differences",
+    "Yes, definitely want children",
+    "Yes, but timing is flexible",
+    "Maybe, open to discussion",
+    "No, prefer not to have children",
+    "Unable to have children, open to adoption",
   ];
 
   @override
@@ -32,7 +30,7 @@ class DifferencesInPartnerPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "When it comes to differences in your partner?",
+            "Do you want to have children?",
             style: AppTextStyles.heading(context),
           ),
           const SizedBox(height: AppSizes.largeSpacing),
@@ -48,7 +46,7 @@ class DifferencesInPartnerPage extends StatelessWidget {
                 value: options[index],
                 groupValue: selectedValue,
                 label: options[index],
-                onChanged: onSelectionChanged,
+                onChanged: onSelected,
               );
             },
           ),

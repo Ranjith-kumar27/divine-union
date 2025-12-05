@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/constants/app_sizes.dart';
+import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/radio_list_item.dart';
 
-class DifferencesInPartnerPage extends StatelessWidget {
+class PartnerHeightPage extends StatelessWidget {
   final String? selectedValue;
-  final ValueChanged<String?> onSelectionChanged;
+  final ValueChanged<String?> onSelected;
 
-  const DifferencesInPartnerPage({
+  const PartnerHeightPage({
     super.key,
     required this.selectedValue,
-    required this.onSelectionChanged,
+    required this.onSelected,
   });
 
   static const options = [
-    "I'm open to different denominational backgrounds",
-    "I'm flexible about different regional cultures",
-    "I appreciate different personality types that complement mine",
-    "I'm interested in partners from different educational backgrounds",
-    "I welcome different career paths and ambitions",
-    "I'm open to different dietary preferences",
-    "I'm comfortable with age differences",
+    "4'0\" - 4'5\" (122-135 cm)",
+    "4'6\" - 4'11\" (137-150 cm)",
+    "5'0\" - 5'5\" (152-165 cm)",
+    "5'6\" - 5'11\" (168-180 cm)",
+    "6'0\" - 6'5\" (183-196 cm)",
+    "6'6\" and above (198+ cm)",
+    "No specific preference",
   ];
 
   @override
@@ -32,7 +32,7 @@ class DifferencesInPartnerPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "When it comes to differences in your partner?",
+            "Height preference for your partner",
             style: AppTextStyles.heading(context),
           ),
           const SizedBox(height: AppSizes.largeSpacing),
@@ -48,7 +48,7 @@ class DifferencesInPartnerPage extends StatelessWidget {
                 value: options[index],
                 groupValue: selectedValue,
                 label: options[index],
-                onChanged: onSelectionChanged,
+                onChanged: onSelected,
               );
             },
           ),

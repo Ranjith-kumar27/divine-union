@@ -25,6 +25,8 @@ import '../../../core/widgets/question-tab1/tradition_page.dart';
 import '../../../core/widgets/question-tab1/weekends_page.dart';
 import '../../../core/widgets/question-tab1/work_location_page.dart';
 import '../../../core/widgets/question-tab1/work_role_page.dart';
+import '../../../core/widgets/question-tab2/children_count_page.dart';
+import '../../../core/widgets/question-tab2/children_desire_page.dart';
 import '../../../core/widgets/question-tab2/christ_centered_life_page.dart';
 import '../../../core/widgets/question-tab2/differences_in_partner_page.dart';
 import '../../../core/widgets/question-tab2/difficult_to_accept_page.dart';
@@ -33,7 +35,10 @@ import '../../../core/widgets/question-tab2/family_dynamic_page.dart';
 import '../../../core/widgets/question-tab2/family_involvement_page.dart';
 import '../../../core/widgets/question-tab2/joy_life_page_one.dart';
 import '../../../core/widgets/question-tab2/life_partner_values_page.dart';
+import '../../../core/widgets/question-tab2/married_life_vision_page.dart';
 import '../../../core/widgets/question-tab2/parents_work_page.dart';
+import '../../../core/widgets/question-tab2/partner_age_range_page.dart';
+import '../../../core/widgets/question-tab2/partner_height_page.dart';
 import '../../../core/widgets/question-tab2/siblings_page.dart';
 import '../../../core/widgets/rounded_button.dart';
 import '../bloc/registration_bloc.dart';
@@ -92,8 +97,14 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
   List<String> _selectedLifePartnerValues = [];
   List<String> _selectedChristCenteredLife = [];
 
-  /// TOTAL PAGES UPDATED - Increased to account for all pages
-  final int totalPages = 29; // 0–28 (was 0-24, now 0-28)
+  String? _partnerAgeRange;
+  String? _partnerHeight;
+  List<String> _marriedLifeVision = [];
+  String? _childrenDesire;
+  String? _childrenCount;
+
+  /// TOTAL PAGES UPDATED - Fixed to match actual page count
+  final int totalPages = 35; // 0–34
 
   // ============== BACK =================
   void _handleBack() {
@@ -158,6 +169,12 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
       'difficultToAccept': _selectedDifficultToAccept,
       'lifePartnerValues': _selectedLifePartnerValues,
       'christCenteredLife': _selectedChristCenteredLife,
+
+      'partnerAgeRange': _partnerAgeRange,
+      'partnerHeight': _partnerHeight,
+      'marriedLifeVision': _marriedLifeVision,
+      'childrenDesire': _childrenDesire,
+      'childrenCount': _childrenCount,
     };
 
     BlocProvider.of<RegistrationBloc>(
@@ -231,6 +248,16 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
         return _selectedLifePartnerValues.isNotEmpty;
       case 29:
         return _selectedChristCenteredLife.isNotEmpty;
+      case 30:
+        return _partnerAgeRange != null;
+      case 31:
+        return _partnerHeight != null;
+      case 32:
+        return _marriedLifeVision.isNotEmpty;
+      case 33:
+        return _childrenDesire != null;
+      case 34:
+        return _childrenCount != null;
 
       default:
         return true;
@@ -414,7 +441,7 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
                   onSelected: (v) => setState(() => _selectedFamilySetup = v),
                 ),
 
-                /// TAB2 screens (19–28)
+                /// TAB2 screens (19–34)
                 ParentsWorkPage(
                   fatherOccupation: _fatherOcc,
                   motherOccupation: _motherOcc,
@@ -507,6 +534,33 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
                       _selectedDifficultToAccept = items;
                     });
                   },
+                ),
+
+                PartnerAgeRangePage(
+                  selectedValue: _partnerAgeRange,
+                  onSelected: (v) => setState(() => _partnerAgeRange = v),
+                ),
+
+                PartnerHeightPage(
+                  selectedValue: _partnerHeight,
+                  onSelected: (v) => setState(() => _partnerHeight = v),
+                ),
+
+                MarriedLifeVisionPage(
+                  selectedItems: _marriedLifeVision,
+                  onSelectionChanged: (items) {
+                    setState(() => _marriedLifeVision = items);
+                  },
+                ),
+
+                ChildrenDesirePage(
+                  selectedValue: _childrenDesire,
+                  onSelected: (v) => setState(() => _childrenDesire = v),
+                ),
+
+                ChildrenCountPage(
+                  selectedValue: _childrenCount,
+                  onSelected: (v) => setState(() => _childrenCount = v),
                 ),
               ],
             ),
