@@ -18,30 +18,51 @@ class ProfileTypeScreen extends StatefulWidget {
 }
 
 class _ProfileTypeScreenState extends State<ProfileTypeScreen> {
-  String? selected;
+  String? selectedType; // for_me or for_family
+  String? selectedRelation; // Son/Daughter/Sister...
 
-  void _toggleSelection(String option) {
+  final List<String> relations = [
+    "Son",
+    "Daughter",
+    "Brother",
+    "Sister",
+    "Friend",
+    "Relative",
+  ];
+
+  void _selectType(String type) {
     setState(() {
-      if (selected == option) {
-        // Allow unselecting by tapping the same option
-        selected = null;
-      } else {
-        selected = option;
+      selectedType = type;
+      if (type == "for_me") {
+        selectedRelation = null; // no relation needed
       }
     });
   }
 
+  void _selectRelation(String r) {
+    setState(() {
+      selectedRelation = r;
+    });
+  }
+
+  /// -------- Next Navigation ----------
   void _next() {
-    if (selected != null) {
+    if (selectedType != null) {
       BlocProvider.of<RegistrationBloc>(
         context,
-      ).add(ProfileTypeSelected(selected!));
-      Navigator.of(context).pushNamed(Routes.personal);
+      ).add(ProfileTypeSelected(selectedType!));
+
+      // You can pass relation also if required
+      Navigator.pushNamed(context, Routes.personal);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool canProceed =
+        selectedType == "for_me" ||
+        (selectedType == "for_family" && selectedRelation != null);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -50,7 +71,6 @@ class _ProfileTypeScreenState extends State<ProfileTypeScreen> {
           children: [
             const SizedBox(height: AppSizes.screenTopSpacing),
 
-            // Main Content
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -63,43 +83,121 @@ class _ProfileTypeScreenState extends State<ProfileTypeScreen> {
                       AppStrings.creatingAMatch,
                       style: AppTextStyles.heading(context),
                     ),
-                    const SizedBox(height: AppSizes.smallSpacing),
+                    const SizedBox(height: 6),
                     Text(
                       AppStrings.letUsKnowForWhom,
                       style: AppTextStyles.heading(context),
                     ),
 
-                    const SizedBox(height: AppSizes.largeSpacing * 2),
+                    const SizedBox(height: 32),
 
-                    // For Me Option
+                    /// ---------------- For Me ----------------
                     _buildOptionCard(
                       title: AppStrings.forMe,
                       subtitle: AppStrings.forMeSubtitle,
                       iconPath: AppAssets.personIcon,
-                      value: 'for_me',
-                      isSelected: selected == 'for_me',
-                      onTap: () => _toggleSelection('for_me'),
+                      isSelected: selectedType == "for_me",
+                      onTap: () => _selectType("for_me"),
                     ),
 
-                    const SizedBox(height: AppSizes.mediumSpacing),
+                    const SizedBox(height: 16),
 
-                    /// TO-DO
-                    // For Family Option
+                    /// ---------------- For Family ----------------
                     _buildOptionCard(
                       title: AppStrings.forFamily,
                       subtitle: AppStrings.forFamilySubtitle,
                       iconPath: AppAssets.personIcon,
-                      value: 'for_family',
-                      isSelected: selected == 'for_family',
-                      onTap: () => (), /// _toggleSelection('for_family')
+                      isSelected: selectedType == "for_family",
+                      onTap: () => _selectType("for_family"),
                     ),
+
+                    /// ------- Show relations only when family selected------
+                    if (selectedType == "for_family") ...[
+                      const SizedBox(height: 30),
+                      Text(
+                        "I'm creating a profile for my",
+                        style: AppTextStyles.body(context),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          double itemWidth =
+                              (constraints.maxWidth - 32) /
+                              3; // 3 items per row
+
+                          return Wrap(
+                            spacing: 16,
+                            runSpacing: 16,
+                            children: relations.map((relation) {
+                              final bool isActive =
+                                  selectedRelation == relation;
+
+                              return SizedBox(
+                                width: itemWidth,
+                                height: 48,
+                                child: ElevatedButton(
+                                  onPressed: () => _selectRelation(relation),
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: isActive
+                                        ? AppColors.primary
+                                        : AppColors.textPrimary,
+                                    side: BorderSide(
+                                      color: isActive
+                                          ? AppColors.primary
+                                          : AppColors.border,
+                                      width: isActive ? 2 : 1,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    relation,
+                                    style: AppTextStyles.body(context).copyWith(
+                                      fontWeight: isActive
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
+                                      color: isActive
+                                          ? AppColors.textPrimary
+                                          : AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        },
+                      ),
+                    ],
 
                     const Spacer(),
 
-                    // Next Button
-                    _buildNextButton(),
+                    /// ---------------- NEXT BUTTON ----------------
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: canProceed ? _next : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: canProceed
+                              ? AppColors.primary
+                              : AppColors.disabled,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          AppStrings.next,
+                          style: AppTextStyles.buttonLabel(context),
+                        ),
+                      ),
+                    ),
 
-                    const SizedBox(height: AppSizes.largeSpacing),
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),
@@ -110,153 +208,75 @@ class _ProfileTypeScreenState extends State<ProfileTypeScreen> {
     );
   }
 
+  /// --------- Option Card Widget ----------
   Widget _buildOptionCard({
     required String title,
     required String subtitle,
     required String iconPath,
-    required String value,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(AppSizes.mediumSpacing),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.border,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-          color: Colors.white,
         ),
-        child: Stack(
+        child: Row(
           children: [
-            // Main content
-            Row(
+            Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSelected
+                    ? AppColors.primary.withOpacity(.15)
+                    : AppColors.surface,
+              ),
+              child: Center(child: Image.asset(iconPath, width: 22)),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: AppSizes.iconSizeLarge * 1.5,
-                  height: AppSizes.iconSizeLarge * 1.5,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+                Text(
+                  title,
+                  style: AppTextStyles.bold(context).copyWith(
                     color: isSelected
-                        ? AppColors.primary.withOpacity(0.1)
-                        : AppColors.surface,
-                  ),
-                  child: Center(
-                    child: Image.asset(
-                      iconPath,
-                      width: AppSizes.iconSizeMedium,
-                      height: AppSizes.iconSizeMedium,
-                    ),
+                        ? AppColors.primary
+                        : AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(width: AppSizes.mediumSpacing),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: AppTextStyles.bold(context).copyWith(
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: AppTextStyles.body(context).copyWith(
-                          color: isSelected
-                              ? AppColors.textPrimary
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: AppTextStyles.body(context).copyWith(
+                    color: isSelected
+                        ? AppColors.textPrimary
+                        : AppColors.textSecondary,
                   ),
                 ),
               ],
             ),
-
-            // Corner checkmark indicator
-            // if (isSelected)
-            //   Positioned(
-            //     top: 0,
-            //     right: 0,
-            //     child: ClipPath(
-            //       clipper: CornerTriangleClipper(),
-            //       child: Container(
-            //         width: AppSizes.iconSizeLarge,
-            //         height: AppSizes.iconSizeLarge,
-            //         color: AppColors.primary,
-            //         child: const Center(
-            //           child: Icon(
-            //             Icons.check,
-            //             color: Colors.white,
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //   ),
+            const Spacer(),
             if (isSelected)
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  width: AppSizes.iconSizeMedium,
-                  height: AppSizes.iconSizeMedium,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primary,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: const Center(
-                    child: Icon(Icons.check, size: 14, color: Colors.white),
-                  ),
+              Container(
+                width: 22,
+                height: 22,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primary,
                 ),
+                child: const Icon(Icons.check, size: 14, color: Colors.white),
               ),
           ],
         ),
       ),
     );
   }
-
-  Widget _buildNextButton() {
-    bool isEnabled = selected != null;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    return SizedBox(
-      width: double.infinity,
-      height: screenHeight * 0.06,
-      child: ElevatedButton(
-        onPressed: isEnabled ? _next : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isEnabled ? AppColors.primary : AppColors.disabled,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          elevation: 0,
-          padding: EdgeInsets.zero,
-          disabledBackgroundColor: AppColors.disabled,
-          disabledForegroundColor: AppColors.textSecondary,
-        ),
-        child: Text(AppStrings.next, style: AppTextStyles.buttonLabel(context)),
-      ),
-    );
-  }
-}
-
-class CornerTriangleClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    var path = Path();
-    path.lineTo(size.width, 0); // Top-right corner
-    path.lineTo(size.width, size.height); // Bottom-right corner
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
