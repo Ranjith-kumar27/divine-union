@@ -40,6 +40,9 @@ import '../../../core/widgets/question-tab2/parents_work_page.dart';
 import '../../../core/widgets/question-tab2/partner_age_range_page.dart';
 import '../../../core/widgets/question-tab2/partner_height_page.dart';
 import '../../../core/widgets/question-tab2/siblings_page.dart';
+import '../../../core/widgets/question-tab3/future_partner_message_page.dart';
+import '../../../core/widgets/question-tab3/hope_for_partner_page.dart';
+import '../../../core/widgets/question-tab3/journey_meaning_page.dart';
 import '../../../core/widgets/rounded_button.dart';
 import '../bloc/registration_bloc.dart';
 import '../bloc/registration_event.dart';
@@ -81,30 +84,30 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
   String? _siblingType;
   int _marriedCount = 0;
   int _unmarriedCount = 0;
-
   String _fatherOcc = "";
   String _motherOcc = "";
-
   String? _familyApproval;
   String? _familyDynamic;
   String? _familyInvolvement;
-
-  /// Add variables for the new pages
   List<String> _selectedJoyOneItems = [];
   List<String> _selectedJoyTwoItems = [];
   String? _selectedDifferencesInPartner;
   List<String> _selectedDifficultToAccept = [];
   List<String> _selectedLifePartnerValues = [];
   List<String> _selectedChristCenteredLife = [];
-
   String? _partnerAgeRange;
   String? _partnerHeight;
   List<String> _marriedLifeVision = [];
   String? _childrenDesire;
   String? _childrenCount;
 
-  /// TOTAL PAGES UPDATED - Fixed to match actual page count
-  final int totalPages = 35; // 0–34
+  /// TAB3 values
+  String? _journeyMeaning;
+  String _futurePartnerMessage = "";
+  String? _hopeForPartner;
+
+  /// TOTAL PAGES UPDATED - Now includes Tab3 pages
+  final int totalPages = 38; // 0–37 (Tab1: 0-18, Tab2: 19-34, Tab3: 35-37)
 
   // ============== BACK =================
   void _handleBack() {
@@ -157,24 +160,25 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
       'unmarriedCount': _unmarriedCount,
       'fatherOccupation': _fatherOcc,
       'motherOccupation': _motherOcc,
-
       'familyApprovalImportance': _familyApproval,
       'familyDynamicExpectation': _familyDynamic,
       'familyDecisionInvolvement': _familyInvolvement,
-
-      /// New pages data
       'joyInLifeOne': _selectedJoyOneItems,
       'joyInLifeTwo': _selectedJoyTwoItems,
       'differencesInPartner': _selectedDifferencesInPartner,
       'difficultToAccept': _selectedDifficultToAccept,
       'lifePartnerValues': _selectedLifePartnerValues,
       'christCenteredLife': _selectedChristCenteredLife,
-
       'partnerAgeRange': _partnerAgeRange,
       'partnerHeight': _partnerHeight,
       'marriedLifeVision': _marriedLifeVision,
       'childrenDesire': _childrenDesire,
       'childrenCount': _childrenCount,
+
+      /// TAB3
+      'journeyMeaning': _journeyMeaning,
+      'futurePartnerMessage': _futurePartnerMessage,
+      'hopeForPartner': _hopeForPartner,
     };
 
     BlocProvider.of<RegistrationBloc>(
@@ -259,6 +263,14 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
       case 34:
         return _childrenCount != null;
 
+      /// TAB3
+      case 35:
+        return _journeyMeaning != null;
+      case 36:
+        return _futurePartnerMessage.isNotEmpty;
+      case 37:
+        return _hopeForPartner != null;
+
       default:
         return true;
     }
@@ -269,7 +281,6 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -304,7 +315,7 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
 
       body: Column(
         children: [
-          /// 3 TAB INDICATOR (Final working logic)
+          /// 3 TAB INDICATOR (Updated to show Tab3 progress)
           Padding(
             padding: const EdgeInsets.only(top: 24, bottom: 20),
             child: Row(
@@ -324,7 +335,9 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
                   width: 100,
                   height: 6,
                   decoration: BoxDecoration(
-                    color: _currentPage >= 19
+                    color: _currentPage >= 19 && _currentPage < 35
+                        ? AppColors.primary
+                        : _currentPage >= 35
                         ? AppColors.primary
                         : AppColors.border,
                     borderRadius: BorderRadius.circular(3),
@@ -336,7 +349,9 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
                   width: 100,
                   height: 6,
                   decoration: BoxDecoration(
-                    color: AppColors.border, // reserved for future Tab3
+                    color: _currentPage >= 35
+                        ? AppColors.primary
+                        : AppColors.border,
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -481,7 +496,6 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
                   onSelected: (v) => setState(() => _familyInvolvement = v),
                 ),
 
-                /// Add JoyInLifePage after FamilyInvolvementPage
                 JoyInLifePageOne(
                   selectedItems: _selectedJoyOneItems,
                   onSelectionChanged: (items) {
@@ -561,6 +575,28 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
                 ChildrenCountPage(
                   selectedValue: _childrenCount,
                   onSelected: (v) => setState(() => _childrenCount = v),
+                ),
+
+                /// TAB3 screens (35–37)
+                JourneyMeaningPage(
+                  selectedValue: _journeyMeaning,
+                  onSelected: (value) {
+                    setState(() => _journeyMeaning = value);
+                  },
+                ),
+
+                FuturePartnerMessagePage(
+                  initialMessage: _futurePartnerMessage,
+                  onChanged: (message) {
+                    setState(() => _futurePartnerMessage = message);
+                  },
+                ),
+
+                HopeForPartnerPage(
+                  selectedValue: _hopeForPartner,
+                  onSelected: (value) {
+                    setState(() => _hopeForPartner = value);
+                  },
                 ),
               ],
             ),
