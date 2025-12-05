@@ -402,6 +402,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   Widget _buildTextField({
     required String hint,
     required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
     VoidCallback? onTap,
     bool readOnly = false,
   }) {
@@ -421,7 +422,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                 controller: controller,
                 onTap: onTap,
                 readOnly: readOnly,
-                keyboardType: readOnly ? null : TextInputType.datetime,
+                keyboardType: readOnly ? null : keyboardType,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: hint,
@@ -654,41 +655,6 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
     );
   }
 
-  Widget _buildLanguageChips() {
-    if (_selectedLanguages.isEmpty) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 12.0),
-      child: Wrap(
-        spacing: 8.0,
-        runSpacing: 8.0,
-        children: _selectedLanguages.map((language) {
-          return Chip(
-            label: Text(
-              language,
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 14.0,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            backgroundColor: AppColors.primary.withOpacity(0.1),
-            deleteIcon: Icon(
-              Icons.close,
-              size: AppSizes.iconSizeSmall,
-              color: AppColors.textSecondary,
-            ),
-            onDeleted: () {
-              setState(() {
-                _selectedLanguages.remove(language);
-              });
-            },
-          );
-        }).toList(),
-      ),
-    );
-  }
-
   Widget _buildKnownLanguagesField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -812,7 +778,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
               const SizedBox(height: AppSizes.largeSpacing),
 
               _buildSectionTitle('Name'),
-              _buildTextField(hint: 'Type here', controller: _nameController),
+              _buildTextField(hint: 'Type here', controller: _nameController, keyboardType: TextInputType.text),
               const SizedBox(height: AppSizes.largeSpacing),
 
               _buildSectionTitle('Date of Birth'),
@@ -820,7 +786,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                 hint: 'dd/mm/yyyy',
                 controller: _dobController,
                 onTap: _showDatePickerBottomSheet,
-                readOnly: false,
+                keyboardType: TextInputType.datetime,
               ),
               const SizedBox(height: AppSizes.largeSpacing),
 

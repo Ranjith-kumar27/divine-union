@@ -219,7 +219,7 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
       case 13:
         return _selectedAlcoholPreference != null;
       case 14:
-        return true; // LifestyleValuesPage allows any number of selections
+        return _selectedLifestyleValues.isNotEmpty;
       case 15:
         return _selectedConflict != null;
       case 16:
@@ -322,17 +322,16 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 100,
+                  width: 120,
                   height: 6,
                   decoration: BoxDecoration(
                     color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
                 const SizedBox(width: 6),
 
                 Container(
-                  width: 100,
+                  width: 120,
                   height: 6,
                   decoration: BoxDecoration(
                     color: _currentPage >= 19 && _currentPage < 35
@@ -340,19 +339,17 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
                         : _currentPage >= 35
                         ? AppColors.primary
                         : AppColors.border,
-                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
                 const SizedBox(width: 6),
 
                 Container(
-                  width: 100,
+                  width: 120,
                   height: 6,
                   decoration: BoxDecoration(
                     color: _currentPage >= 35
                         ? AppColors.primary
                         : AppColors.border,
-                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
               ],

@@ -53,7 +53,8 @@ class CustomBottomSheet extends StatefulWidget {
       options: options,
       selectedValue: selectedValue,
       onSelect: onSelect,
-      showSearch: false, // Changed from true to false
+      showSearch: false,
+      // Changed from true to false
       heightFactor: 0.6,
     );
   }
@@ -68,9 +69,11 @@ class CustomBottomSheet extends StatefulWidget {
       title: 'Select Known Languages',
       options: options,
       selectedValues: selectedValues,
-      onSelect: (_) {}, // Empty function since we use onMultiSelect
+      onSelect: (_) {},
+      // Empty function since we use onMultiSelect
       onMultiSelect: onSelect,
-      showSearch: false, // Changed from true to false
+      showSearch: false,
+      // Changed from true to false
       heightFactor: 0.7,
       isMultiSelect: true,
     );
@@ -268,105 +271,119 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
             Expanded(
               child: _filteredOptions.isEmpty
                   ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text(
-                    'No results found',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 16.0,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-              )
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(
+                          'No results found',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 16.0,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    )
                   : ListView.builder(
-                padding: const EdgeInsets.all(8.0),
-                itemCount: _filteredOptions.length,
-                itemBuilder: (context, index) {
-                  final option = _filteredOptions[index];
-                  final isSelected = widget.isMultiSelect
-                      ? _tempSelectedValues.contains(option)
-                      : widget.selectedValue == option;
+                      padding: const EdgeInsets.all(8.0),
+                      itemCount: _filteredOptions.length,
+                      itemBuilder: (context, index) {
+                        final option = _filteredOptions[index];
+                        final isSelected = widget.isMultiSelect
+                            ? _tempSelectedValues.contains(option)
+                            : widget.selectedValue == option;
 
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: index == 0
-                            ? BorderSide.none
-                            : BorderSide(
-                          color: AppColors.border,
-                          width: 0.5,
-                        ),
-                        bottom: BorderSide(
-                          color: AppColors.border,
-                          width: 0.5,
-                        ),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                        vertical: 4.0,
-                      ),
-                      child: Material(
-                        color: isSelected
-                            ? AppColors.liteDisabled
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                            vertical: 12.0,
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              top: index == 0
+                                  ? BorderSide.none
+                                  : BorderSide(
+                                      color: AppColors.border,
+                                      width: 0.5,
+                                    ),
+                              bottom: BorderSide(
+                                color: AppColors.border,
+                                width: 0.5,
+                              ),
+                            ),
                           ),
-                          title: Text(
-                            option,
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                              vertical: 4.0,
+                            ),
+                            child: Material(
                               color: isSelected
-                                  ? AppColors.textPrimary
-                                  : AppColors.textSecondary,
+                                  ? AppColors.liteDisabled
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                  vertical: 12.0,
+                                ),
+                                title: Text(
+                                  option,
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w400,
+                                    color: isSelected
+                                        ? AppColors.textPrimary
+                                        : AppColors.textSecondary,
+                                  ),
+                                ),
+                                trailing: widget.isMultiSelect
+                                    ? Checkbox(
+                                        value: isSelected,
+                                        onChanged: (_) =>
+                                            _handleMultiSelect(option),
+                                        activeColor: AppColors.primary,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            4.0,
+                                          ),
+                                        ),
+                                      )
+                                    : Container(
+                                        // This is the corrected radio button
+                                        width: 22,
+                                        height: 22,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: isSelected
+                                                ? AppColors.primary
+                                                : AppColors.border,
+                                            width: 2,
+                                          ),
+                                          color: isSelected
+                                              ? AppColors.primary
+                                              : Colors.transparent,
+                                        ),
+                                        child: isSelected
+                                            ? const Icon(
+                                                Icons.circle,
+                                                size: 12,
+                                                color: Colors.white,
+                                              )
+                                            : null,
+                                      ),
+                                onTap: widget.isMultiSelect
+                                    ? () => _handleMultiSelect(option)
+                                    : () {
+                                        widget.onSelect(option);
+                                        Navigator.pop(context);
+                                      },
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
                             ),
                           ),
-                          trailing: widget.isMultiSelect
-                              ? Checkbox(
-                            value: isSelected,
-                            onChanged: (_) =>
-                                _handleMultiSelect(option),
-                            activeColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                              BorderRadius.circular(4.0),
-                            ),
-                          )
-                              : DesignRadioButton<String>(
-                            value: option,
-                            groupValue: widget.selectedValue,
-                            onChanged: (value) {
-                              if (value != null) {
-                                widget.onSelect(value);
-                                Navigator.pop(context);
-                              }
-                            },
-                            size: 24.0,
-                          ),
-                          onTap: widget.isMultiSelect
-                              ? () => _handleMultiSelect(option)
-                              : () {
-                            widget.onSelect(option);
-                            Navigator.pop(context);
-                          },
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
 
             // Apply button for multi-select
@@ -382,8 +399,9 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                        BorderRadius.circular(AppSizes.buttonRadius),
+                        borderRadius: BorderRadius.circular(
+                          AppSizes.buttonRadius,
+                        ),
                       ),
                       elevation: 0,
                     ),
@@ -432,26 +450,58 @@ class DesignRadioButton<T> extends StatelessWidget {
         }
       },
       child: Container(
+        width: 22, // Changed from dynamic size to fixed 22
+        height: 22, // Changed from dynamic size to fixed 22
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: 2,
+          ),
+          color: isSelected ? AppColors.primary : Colors.transparent,
+        ),
+        child: isSelected
+            ? const Icon(Icons.circle, size: 12, color: Colors.white)
+            : null,
+      ),
+    );
+  }
+}
+
+class CircleRadioButton extends StatelessWidget {
+  final bool isSelected;
+  final VoidCallback? onTap;
+  final double size;
+
+  const CircleRadioButton({
+    super.key,
+    required this.isSelected,
+    this.onTap,
+    this.size = 22.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
         width: size,
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.border,
-            width: 2.0,
+            width: 2,
           ),
+          color: isSelected ? AppColors.primary : Colors.transparent,
         ),
-        child: Center(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: isSelected ? size * 0.5 : 0,
-            height: isSelected ? size * 0.5 : 0,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isSelected ? AppColors.primary : Colors.transparent,
-            ),
-          ),
-        ),
+        child: isSelected
+            ? Icon(
+                Icons.circle,
+                size: size * 0.545,
+                color: Colors.white,
+              ) // 12/22 ≈ 0.545
+            : null,
       ),
     );
   }
