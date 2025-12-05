@@ -542,12 +542,9 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         const SizedBox(width: 18.0),
-                        Icon(
-                          gender == 'Male' ? Icons.male : Icons.female,
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.textSecondary,
-                          size: AppSizes.iconSizeMedium,
+                        SvgPicture.asset(
+                          gender == 'Male' ? AppAssets.male : AppAssets.female,
+                          color: isSelected ? AppColors.primary : AppColors.textSecondary,
                         ),
                         const SizedBox(width: 8.0),
                         Text(
@@ -555,9 +552,9 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontSize: 16.0,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                             color: isSelected
-                                ? AppColors.primary
+                                ? AppColors.textPrimary
                                 : AppColors.textSecondary,
                           ),
                         ),
@@ -700,42 +697,69 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
         GestureDetector(
           onTap: _showKnownLanguagesBottomSheet,
           child: Container(
-            height: AppSizes.fieldHeight,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
               color: AppColors.fieldBackground,
               borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
               border: Border.all(color: AppColors.border),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Text(
-                    _selectedLanguages.isNotEmpty
-                        ? _selectedLanguages.join(', ')
-                        : 'Select',
+                  child: _selectedLanguages.isEmpty
+                      ? Text(
+                    "Select",
                     style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 16.0,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: _selectedLanguages.isNotEmpty
-                          ? AppColors.textPrimary
-                          : AppColors.textSecondary.withOpacity(0.5),
+                      color: AppColors.textSecondary.withOpacity(0.5),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  )
+                      : Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _selectedLanguages.map((lang) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              lang,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() => _selectedLanguages.remove(lang));
+                              },
+                              child: const Icon(Icons.close, size: 16),
+                            )
+                          ],
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
-                IconButton(
-                  icon: SvgPicture.asset(AppAssets.arrowDown),
-                  onPressed: _showKnownLanguagesBottomSheet,
-                  padding: const EdgeInsets.all(8.0),
-                ),
+
+                /// Drop arrow
+                Padding(
+                  padding: const EdgeInsets.only(left: 8, top: 4),
+                  child: SvgPicture.asset(AppAssets.arrowDown),
+                )
               ],
             ),
           ),
         ),
-        _buildLanguageChips(),
       ],
     );
   }
