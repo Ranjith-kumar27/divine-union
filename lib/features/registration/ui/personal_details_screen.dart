@@ -513,61 +513,67 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('Gender'),
-        Row(
-          children: _genderOptions.map((gender) {
-            final isSelected = _selectedGender == gender;
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 28.0),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedGender = gender;
-                    });
-                  },
-                  child: Container(
-                    height: AppSizes.fieldHeight,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.primary.withOpacity(0.1)
-                          : AppColors.fieldBackground,
-                      borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
-                      border: Border.all(
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.border,
-                        width: isSelected ? 2.0 : 1.0,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const SizedBox(width: 18.0),
-                        SvgPicture.asset(
-                          gender == 'Male' ? AppAssets.male : AppAssets.female,
-                          color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                        ),
-                        const SizedBox(width: 8.0),
-                        Text(
-                          gender,
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                            color: isSelected
-                                ? AppColors.textPrimary
-                                : AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+        const SizedBox(height: 10),
+
+        LayoutBuilder(
+          builder: (context, constraints) {
+            double itemWidth =
+                (constraints.maxWidth - 14) / 2; // 2 buttons + spacing
+
+            return Row(
+              children: [
+                _genderButton("Male", itemWidth),
+                const SizedBox(width: 12), // <-- SPACE BETWEEN BUTTONS
+                _genderButton("Female", itemWidth),
+              ],
             );
-          }).toList(),
+          },
         ),
       ],
+    );
+  }
+
+  Widget _genderButton(String gender, double width) {
+    final bool isSelected = _selectedGender == gender;
+
+    return SizedBox(
+      width: width,
+      height: 48,
+      child: ElevatedButton(
+        onPressed: () => setState(() => _selectedGender = gender),
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          side: BorderSide(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: isSelected ? 2 : 1,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              gender == "Male" ? AppAssets.male : AppAssets.female,
+              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              gender,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+                color: isSelected
+                    ? AppColors.textPrimary
+                    : AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -675,53 +681,57 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                 Expanded(
                   child: _selectedLanguages.isEmpty
                       ? Text(
-                    "Select",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary.withOpacity(0.5),
-                    ),
-                  )
+                          "Select",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary.withOpacity(0.5),
+                          ),
+                        )
                       : Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _selectedLanguages.map((lang) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              lang,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _selectedLanguages.map((lang) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                            ),
-                            const SizedBox(width: 6),
-                            GestureDetector(
-                              onTap: () {
-                                setState(() => _selectedLanguages.remove(lang));
-                              },
-                              child: const Icon(Icons.close, size: 16),
-                            )
-                          ],
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    lang,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(
+                                        () => _selectedLanguages.remove(lang),
+                                      );
+                                    },
+                                    child: const Icon(Icons.close, size: 16),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
                         ),
-                      );
-                    }).toList(),
-                  ),
                 ),
 
                 /// Drop arrow
                 Padding(
                   padding: const EdgeInsets.only(left: 8, top: 4),
                   child: SvgPicture.asset(AppAssets.arrowDown),
-                )
+                ),
               ],
             ),
           ),
@@ -778,7 +788,11 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
               const SizedBox(height: AppSizes.largeSpacing),
 
               _buildSectionTitle('Name'),
-              _buildTextField(hint: 'Type here', controller: _nameController, keyboardType: TextInputType.text),
+              _buildTextField(
+                hint: 'Type here',
+                controller: _nameController,
+                keyboardType: TextInputType.text,
+              ),
               const SizedBox(height: AppSizes.largeSpacing),
 
               _buildSectionTitle('Date of Birth'),
