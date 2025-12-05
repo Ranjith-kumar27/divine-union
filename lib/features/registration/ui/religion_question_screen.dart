@@ -279,39 +279,46 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
   // =============== UI ===============
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return PopScope(
+      canPop: _currentPage == 0, // Only allow popping when on first page
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          _handleBack();
+        }
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
-        leadingWidth: 55,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12, top: 12),
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.border),
-            ),
-            child: IconButton(
-              icon: SvgPicture.asset(AppAssets.arrowRight),
-              onPressed: _handleBack,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leadingWidth: 55,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 12, top: 12),
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.border),
+              ),
+              child: IconButton(
+                icon: SvgPicture.asset(AppAssets.arrowRight),
+                onPressed: _handleBack,
+              ),
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (_currentPage < totalPages - 1) {
+                  _pageController.nextPage(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              },
+              child: const Text("Skip", style: TextStyle(color: Colors.grey)),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              if (_currentPage < totalPages - 1) {
-                _pageController.nextPage(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeInOut,
-                );
-              }
-            },
-            child: const Text("Skip", style: TextStyle(color: Colors.grey)),
-          ),
-        ],
-      ),
 
       body: Column(
         children: [
@@ -611,6 +618,7 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
           ),
         ],
       ),
+        ),
     );
   }
 }

@@ -284,7 +284,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                       ),
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(0.0),
                       itemCount: _filteredOptions.length,
                       itemBuilder: (context, index) {
                         final option = _filteredOptions[index];
@@ -309,8 +309,8 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                           ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                              vertical: 4.0,
+                              horizontal: 0.0,
+                              vertical: 0.0,
                             ),
                             child: Material(
                               color: isSelected
