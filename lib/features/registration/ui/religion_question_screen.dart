@@ -1,3 +1,4 @@
+import 'package:divineunion_matrimony/core/widgets/question-tab2/joy_life_page_two.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,18 +9,32 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/question-tab1/alcohol_preference_page.dart';
 import '../../../core/widgets/question-tab1/attendance_page.dart';
 import '../../../core/widgets/question-tab1/career_approach_page.dart';
+import '../../../core/widgets/question-tab1/conflict_handling_page.dart';
 import '../../../core/widgets/question-tab1/dietary_preference_page.dart';
 import '../../../core/widgets/question-tab1/education_background_page.dart';
 import '../../../core/widgets/question-tab1/faith_journey_page.dart';
+import '../../../core/widgets/question-tab1/family_setup_page.dart';
 import '../../../core/widgets/question-tab1/future_partner_denomination_page.dart';
 import '../../../core/widgets/question-tab1/involvement_page.dart';
 import '../../../core/widgets/question-tab1/lifestyle_values_page.dart';
 import '../../../core/widgets/question-tab1/ministry_calling_page.dart';
+import '../../../core/widgets/question-tab1/peaceful_evening_page.dart';
 import '../../../core/widgets/question-tab1/relocation_preference_page.dart';
 import '../../../core/widgets/question-tab1/spend_time_page.dart';
 import '../../../core/widgets/question-tab1/tradition_page.dart';
+import '../../../core/widgets/question-tab1/weekends_page.dart';
 import '../../../core/widgets/question-tab1/work_location_page.dart';
 import '../../../core/widgets/question-tab1/work_role_page.dart';
+import '../../../core/widgets/question-tab2/christ_centered_life_page.dart';
+import '../../../core/widgets/question-tab2/differences_in_partner_page.dart';
+import '../../../core/widgets/question-tab2/difficult_to_accept_page.dart';
+import '../../../core/widgets/question-tab2/family_approval_page.dart';
+import '../../../core/widgets/question-tab2/family_dynamic_page.dart';
+import '../../../core/widgets/question-tab2/family_involvement_page.dart';
+import '../../../core/widgets/question-tab2/joy_life_page_one.dart';
+import '../../../core/widgets/question-tab2/life_partner_values_page.dart';
+import '../../../core/widgets/question-tab2/parents_work_page.dart';
+import '../../../core/widgets/question-tab2/siblings_page.dart';
 import '../../../core/widgets/rounded_button.dart';
 import '../bloc/registration_bloc.dart';
 import '../bloc/registration_event.dart';
@@ -35,7 +50,7 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  // Single-selection fields
+  /// TAB1 values
   String? _selectedTradition;
   String? _selectedAttendance;
   String? _selectedChurchActivities;
@@ -49,15 +64,38 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
   String? _selectedRelocationPreference;
   String? _selectedDietaryPreference;
   String? _selectedAlcoholPreference;
-
-  // Work location dropdowns
   String? _selectedWorkCity;
   String? _selectedWorkCountry;
-
-  // Multi-select lifestyle
   List<String> _selectedLifestyleValues = [];
+  String? _selectedConflict;
+  String? _selectedWeekend;
+  String? _selectedEvening;
+  String? _selectedFamilySetup;
 
-  // Helper methods
+  /// TAB2 values
+  String? _siblingType;
+  int _marriedCount = 0;
+  int _unmarriedCount = 0;
+
+  String _fatherOcc = "";
+  String _motherOcc = "";
+
+  String? _familyApproval;
+  String? _familyDynamic;
+  String? _familyInvolvement;
+
+  /// Add variables for the new pages
+  List<String> _selectedJoyOneItems = [];
+  List<String> _selectedJoyTwoItems = [];
+  String? _selectedDifferencesInPartner;
+  List<String> _selectedDifficultToAccept = [];
+  List<String> _selectedLifePartnerValues = [];
+  List<String> _selectedChristCenteredLife = [];
+
+  /// TOTAL PAGES UPDATED - Increased to account for all pages
+  final int totalPages = 29; // 0–28 (was 0-24, now 0-28)
+
+  // ============== BACK =================
   void _handleBack() {
     if (_currentPage > 0) {
       _pageController.previousPage(
@@ -65,14 +103,13 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      // If we're on the first page, close the entire screen
       Navigator.pop(context);
     }
   }
 
+  // ============== NEXT =================
   void _handleNext() {
-    final lastIndex = 15; // There are 15 pages (0-14)
-    if (_currentPage < lastIndex - 1) {
+    if (_currentPage < totalPages - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -80,8 +117,8 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
       return;
     }
 
-    // Collect answers
     final answers = {
+      /// TAB1
       'tradition': _selectedTradition,
       'attendance': _selectedAttendance,
       'involved': _selectedChurchActivities,
@@ -98,6 +135,29 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
       'dietaryPreference': _selectedDietaryPreference,
       'alcoholPreference': _selectedAlcoholPreference,
       'lifestyleValues': _selectedLifestyleValues,
+      'conflictHandling': _selectedConflict,
+      'weekendStyle': _selectedWeekend,
+      'peacefulEvening': _selectedEvening,
+      'familySetup': _selectedFamilySetup,
+
+      /// TAB2
+      'siblingType': _siblingType,
+      'marriedCount': _marriedCount,
+      'unmarriedCount': _unmarriedCount,
+      'fatherOccupation': _fatherOcc,
+      'motherOccupation': _motherOcc,
+
+      'familyApprovalImportance': _familyApproval,
+      'familyDynamicExpectation': _familyDynamic,
+      'familyDecisionInvolvement': _familyInvolvement,
+
+      /// New pages data
+      'joyInLifeOne': _selectedJoyOneItems,
+      'joyInLifeTwo': _selectedJoyTwoItems,
+      'differencesInPartner': _selectedDifferencesInPartner,
+      'difficultToAccept': _selectedDifficultToAccept,
+      'lifePartnerValues': _selectedLifePartnerValues,
+      'christCenteredLife': _selectedChristCenteredLife,
     };
 
     BlocProvider.of<RegistrationBloc>(
@@ -106,8 +166,8 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
     BlocProvider.of<RegistrationBloc>(context).add(SubmitRegistration());
   }
 
+  // ========== Next Button Validation ==========
   bool _isNextEnabled() {
-    // Validate the current page's required selection(s)
     switch (_currentPage) {
       case 0:
         return _selectedTradition != null;
@@ -128,7 +188,6 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
       case 8:
         return _selectedWorkRole != null;
       case 9:
-        // work location requires city & country selected
         return _selectedWorkCity != null && _selectedWorkCountry != null;
       case 10:
         return _selectedCareerApproach != null;
@@ -139,41 +198,51 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
       case 13:
         return _selectedAlcoholPreference != null;
       case 14:
-        // lifestyle values page: allow empty
-        return true;
+        return true; // LifestyleValuesPage allows any number of selections
+      case 15:
+        return _selectedConflict != null;
+      case 16:
+        return _selectedWeekend != null;
+      case 17:
+        return _selectedEvening != null;
+      case 18:
+        return _selectedFamilySetup != null;
+
+      /// TAB2
+      case 19:
+        return _fatherOcc.isNotEmpty && _motherOcc.isNotEmpty;
+      case 20:
+        return _siblingType != null;
+      case 21:
+        return _familyApproval != null;
+      case 22:
+        return _familyDynamic != null;
+      case 23:
+        return _familyInvolvement != null;
+      case 24:
+        return _selectedJoyOneItems.isNotEmpty;
+      case 25:
+        return _selectedJoyTwoItems.isNotEmpty;
+      case 26:
+        return _selectedDifferencesInPartner != null;
+      case 27:
+        return _selectedDifficultToAccept.isNotEmpty;
+      case 28:
+        return _selectedLifePartnerValues.isNotEmpty;
+      case 29:
+        return _selectedChristCenteredLife.isNotEmpty;
+
       default:
         return true;
     }
   }
 
-  Widget _buildPageIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        3,
-        (index) => Container(
-          width: 120,
-          height: 6,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            color: _currentPage == index ? AppColors.primary : AppColors.border,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
+  // =============== UI ===============
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -194,149 +263,266 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              if (_currentPage < 14) {
+              if (_currentPage < totalPages - 1) {
                 _pageController.nextPage(
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeInOut,
                 );
               }
             },
-            child: const Text(
-              'Skip',
-              style: TextStyle(color: Colors.grey, fontSize: 15),
-            ),
+            child: const Text("Skip", style: TextStyle(color: Colors.grey)),
           ),
         ],
       ),
 
-      body: SafeArea(
-        child: Column(
-          children: [
-            /// ---------- Page Indicator ----------
-            Padding(
-              padding: const EdgeInsets.only(top: 24, bottom: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  3,
-                  (index) => Container(
-                    width: 110,
-                    height: 6,
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    decoration: BoxDecoration(
-                      color: _currentPage ~/ 5 == index
-                          ? AppColors.primary
-                          : AppColors.border,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
+      body: Column(
+        children: [
+          /// 3 TAB INDICATOR (Final working logic)
+          Padding(
+            padding: const EdgeInsets.only(top: 24, bottom: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 100,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
-              ),
-            ),
+                const SizedBox(width: 6),
 
-            /// ---------- Pages ----------
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: PageView(
-                  controller: _pageController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  onPageChanged: (i) => setState(() => _currentPage = i),
-                  children: [
-                    TraditionPage(
-                      selectedValue: _selectedTradition,
-                      onSelected: (v) => setState(() => _selectedTradition = v),
-                    ),
-                    AttendancePage(
-                      selectedValue: _selectedAttendance,
-                      onSelected: (v) =>
-                          setState(() => _selectedAttendance = v),
-                    ),
-                    InvolvementPage(
-                      selectedValue: _selectedChurchActivities,
-                      onSelected: (v) =>
-                          setState(() => _selectedChurchActivities = v),
-                    ),
-                    FaithJourneyPage(
-                      selectedValue: _selectedFaithJourney,
-                      onSelected: (v) =>
-                          setState(() => _selectedFaithJourney = v),
-                    ),
-                    SpendTimePage(
-                      selectedValue: _selectedSpendTime,
-                      onSelected: (v) => setState(() => _selectedSpendTime = v),
-                    ),
-                    FuturePartnerDenominationPage(
-                      selectedValue: _selectedFuturePartnerDenomination,
-                      onSelected: (v) => setState(
-                        () => _selectedFuturePartnerDenomination = v,
-                      ),
-                    ),
-                    MinistryCallingPage(
-                      selectedValue: _selectedMinistryCalling,
-                      onSelected: (v) =>
-                          setState(() => _selectedMinistryCalling = v),
-                    ),
-                    EducationBackgroundPage(
-                      selectedValue: _selectedEducationBackground,
-                      onSelected: (v) =>
-                          setState(() => _selectedEducationBackground = v),
-                    ),
-                    WorkRolePage(
-                      selectedValue: _selectedWorkRole,
-                      onSelected: (v) => setState(() => _selectedWorkRole = v),
-                    ),
-                    WorkLocationPage(
-                      selectedCity: _selectedWorkCity,
-                      selectedCountry: _selectedWorkCountry,
-                      onCitySelected: (v) =>
-                          setState(() => _selectedWorkCity = v),
-                      onCountrySelected: (v) =>
-                          setState(() => _selectedWorkCountry = v),
-                    ),
-                    CareerApproachPage(
-                      selectedValue: _selectedCareerApproach,
-                      onSelected: (v) =>
-                          setState(() => _selectedCareerApproach = v),
-                    ),
-                    RelocationPreferencePage(
-                      selectedValue: _selectedRelocationPreference,
-                      onSelected: (v) =>
-                          setState(() => _selectedRelocationPreference = v),
-                    ),
-                    DietaryPreferencePage(
-                      selectedValue: _selectedDietaryPreference,
-                      onSelected: (v) =>
-                          setState(() => _selectedDietaryPreference = v),
-                    ),
-                    AlcoholPreferencePage(
-                      selectedValue: _selectedAlcoholPreference,
-                      onSelected: (v) =>
-                          setState(() => _selectedAlcoholPreference = v),
-                    ),
-                    LifestyleValuesPage(
-                      selectedValues: _selectedLifestyleValues,
-                      onSelectionChanged: (v) =>
-                          setState(() => _selectedLifestyleValues = v),
-                    ),
-                  ],
+                Container(
+                  width: 100,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: _currentPage >= 19
+                        ? AppColors.primary
+                        : AppColors.border,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
                 ),
-              ),
-            ),
+                const SizedBox(width: 6),
 
-            /// ---------- Bottom Next Button ----------
-            Padding(
-              padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
-              child: SizedBox(
-                width: double.infinity,
-                child: RoundedButton(
-                  label: AppStrings.next,
-                  onPressed: _isNextEnabled() ? _handleNext : null,
+                Container(
+                  width: 100,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: AppColors.border, // reserved for future Tab3
+                    borderRadius: BorderRadius.circular(3),
+                  ),
                 ),
+              ],
+            ),
+          ),
+
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              onPageChanged: (i) => setState(() => _currentPage = i),
+
+              children: [
+                /// TAB1 screens (0–18)
+                TraditionPage(
+                  selectedValue: _selectedTradition,
+                  onSelected: (v) => setState(() => _selectedTradition = v),
+                ),
+                AttendancePage(
+                  selectedValue: _selectedAttendance,
+                  onSelected: (v) => setState(() => _selectedAttendance = v),
+                ),
+                InvolvementPage(
+                  selectedValue: _selectedChurchActivities,
+                  onSelected: (v) =>
+                      setState(() => _selectedChurchActivities = v),
+                ),
+                FaithJourneyPage(
+                  selectedValue: _selectedFaithJourney,
+                  onSelected: (v) => setState(() => _selectedFaithJourney = v),
+                ),
+                SpendTimePage(
+                  selectedValue: _selectedSpendTime,
+                  onSelected: (v) => setState(() => _selectedSpendTime = v),
+                ),
+                FuturePartnerDenominationPage(
+                  selectedValue: _selectedFuturePartnerDenomination,
+                  onSelected: (v) =>
+                      setState(() => _selectedFuturePartnerDenomination = v),
+                ),
+                MinistryCallingPage(
+                  selectedValue: _selectedMinistryCalling,
+                  onSelected: (v) =>
+                      setState(() => _selectedMinistryCalling = v),
+                ),
+                EducationBackgroundPage(
+                  selectedValue: _selectedEducationBackground,
+                  onSelected: (v) =>
+                      setState(() => _selectedEducationBackground = v),
+                ),
+                WorkRolePage(
+                  selectedValue: _selectedWorkRole,
+                  onSelected: (v) => setState(() => _selectedWorkRole = v),
+                ),
+                WorkLocationPage(
+                  selectedCity: _selectedWorkCity,
+                  selectedCountry: _selectedWorkCountry,
+                  onCitySelected: (v) => setState(() => _selectedWorkCity = v),
+                  onCountrySelected: (v) =>
+                      setState(() => _selectedWorkCountry = v),
+                ),
+                CareerApproachPage(
+                  selectedValue: _selectedCareerApproach,
+                  onSelected: (v) =>
+                      setState(() => _selectedCareerApproach = v),
+                ),
+                RelocationPreferencePage(
+                  selectedValue: _selectedRelocationPreference,
+                  onSelected: (v) =>
+                      setState(() => _selectedRelocationPreference = v),
+                ),
+                DietaryPreferencePage(
+                  selectedValue: _selectedDietaryPreference,
+                  onSelected: (v) =>
+                      setState(() => _selectedDietaryPreference = v),
+                ),
+                AlcoholPreferencePage(
+                  selectedValue: _selectedAlcoholPreference,
+                  onSelected: (v) =>
+                      setState(() => _selectedAlcoholPreference = v),
+                ),
+                LifestyleValuesPage(
+                  selectedValues: _selectedLifestyleValues,
+                  onSelectionChanged: (v) =>
+                      setState(() => _selectedLifestyleValues = v),
+                ),
+                ConflictHandlingPage(
+                  selectedValue: _selectedConflict,
+                  onSelected: (v) => setState(() => _selectedConflict = v),
+                ),
+                WeekendsPage(
+                  selectedValue: _selectedWeekend,
+                  onSelected: (v) => setState(() => _selectedWeekend = v),
+                ),
+                PeacefulEveningPage(
+                  selectedValue: _selectedEvening,
+                  onSelected: (v) => setState(() => _selectedEvening = v),
+                ),
+                FamilySetupPage(
+                  selectedValue: _selectedFamilySetup,
+                  onSelected: (v) => setState(() => _selectedFamilySetup = v),
+                ),
+
+                /// TAB2 screens (19–28)
+                ParentsWorkPage(
+                  fatherOccupation: _fatherOcc,
+                  motherOccupation: _motherOcc,
+                  onChanged: (f, m) {
+                    setState(() {
+                      _fatherOcc = f;
+                      _motherOcc = m;
+                    });
+                  },
+                ),
+
+                SiblingsPage(
+                  selectedValue: _siblingType,
+                  marriedCount: _marriedCount,
+                  unmarriedCount: _unmarriedCount,
+                  onSelected: (v) => setState(() => _siblingType = v),
+                  onSiblingCountChanged: (m, u) {
+                    setState(() {
+                      _marriedCount = m;
+                      _unmarriedCount = u;
+                    });
+                  },
+                ),
+
+                FamilyApprovalImportancePage(
+                  selectedValue: _familyApproval,
+                  onSelected: (v) => setState(() => _familyApproval = v),
+                ),
+
+                FamilyDynamicPage(
+                  selectedValue: _familyDynamic,
+                  onSelected: (v) => setState(() => _familyDynamic = v),
+                ),
+
+                FamilyInvolvementPage(
+                  selectedValue: _familyInvolvement,
+                  onSelected: (v) => setState(() => _familyInvolvement = v),
+                ),
+
+                /// Add JoyInLifePage after FamilyInvolvementPage
+                JoyInLifePageOne(
+                  selectedItems: _selectedJoyOneItems,
+                  onSelectionChanged: (items) {
+                    setState(() {
+                      _selectedJoyOneItems = items;
+                    });
+                  },
+                ),
+
+                JoyInLifePageTwo(
+                  selectedItems: _selectedJoyTwoItems,
+                  onSelectionChanged: (items) {
+                    setState(() {
+                      _selectedJoyTwoItems = items;
+                    });
+                  },
+                ),
+
+                ChristCenteredLifePage(
+                  selectedItems: _selectedChristCenteredLife,
+                  onSelectionChanged: (items) {
+                    setState(() {
+                      _selectedChristCenteredLife = items;
+                    });
+                  },
+                ),
+
+                LifePartnerValuesPage(
+                  selectedItems: _selectedLifePartnerValues,
+                  onSelectionChanged: (items) {
+                    setState(() {
+                      _selectedLifePartnerValues = items;
+                    });
+                  },
+                ),
+
+                DifferencesInPartnerPage(
+                  selectedValue: _selectedDifferencesInPartner,
+                  onSelectionChanged: (value) {
+                    setState(() {
+                      _selectedDifferencesInPartner = value;
+                    });
+                  },
+                ),
+
+                DifficultToAcceptPage(
+                  selectedItems: _selectedDifficultToAccept,
+                  onSelectionChanged: (items) {
+                    setState(() {
+                      _selectedDifficultToAccept = items;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
+            child: SizedBox(
+              width: double.infinity,
+              child: RoundedButton(
+                label: AppStrings.next,
+                onPressed: _isNextEnabled() ? _handleNext : null,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

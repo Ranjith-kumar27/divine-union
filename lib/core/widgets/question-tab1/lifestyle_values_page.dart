@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_text_styles.dart';
@@ -58,13 +59,13 @@ class _LifestyleValuesPageState extends State<LifestyleValuesPage> {
             style: AppTextStyles.heading(context),
           ),
 
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSizes.mediumSpacing),
 
           Text(
             "Maximum of 5 can be selected",
-            // style: AppTextStyles.bodySmall(context)!.copyWith(
-            //   color: AppColors.textLight,
-            // ),
+            style: AppTextStyles.bold(
+              context,
+            ).copyWith(color: AppColors.textSecondary),
           ),
 
           const SizedBox(height: AppSizes.largeSpacing),
@@ -81,25 +82,35 @@ class _LifestyleValuesPageState extends State<LifestyleValuesPage> {
                 children: [
                   InkWell(
                     onTap: () => setState(() => _toggleSelection(item)),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            child: Text(
-                              item,
-                              style: AppTextStyles.body(context),
+                    child: Container(
+                      color: isSelected
+                          ? AppColors.liteDisabled
+                          : Colors.transparent,
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      // small spacing so background visible
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              child: Text(
+                                item,
+                                style: AppTextStyles.bold(context)!.copyWith(
+                                  color: isSelected
+                                      ? AppColors.textPrimary
+                                      : AppColors.textSecondary,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        Checkbox(
-                          value: isSelected,
-                          activeColor: AppColors.primary,
-                          onChanged: (_) {
-                            setState(() => _toggleSelection(item));
-                          },
-                        ),
-                      ],
+                          Checkbox(
+                            value: isSelected,
+                            activeColor: AppColors.primary,
+                            onChanged: (_) =>
+                                setState(() => _toggleSelection(item)),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 

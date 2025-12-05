@@ -40,26 +40,19 @@ class RadioListItem<T> extends StatelessWidget {
           ),
         ),
         trailing: Container(
-          width: 24,
-          height: 24,
+          width: 22,
+          height: 22,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
               color: selected ? AppColors.primary : AppColors.border,
-              width: 2.0,
+              width: 2,
             ),
+            color: selected ? AppColors.primary : Colors.transparent,
           ),
-          child: Center(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: selected ? 12.0 : 0,
-              height: selected ? 12.0 : 0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: selected ? AppColors.primary : Colors.transparent,
-              ),
-            ),
-          ),
+          child: selected
+              ? const Icon(Icons.circle, size: 12, color: Colors.white)
+              : null,
         ),
         tileColor: selected ? AppColors.liteDisabled : null,
         onTap: () => onChanged(value),
