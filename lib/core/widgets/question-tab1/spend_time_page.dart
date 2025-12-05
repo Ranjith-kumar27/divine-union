@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_sizes.dart';
-import '../../../../core/constants/app_text_styles.dart';
-import '../../../../core/widgets/radio_list_item.dart';
+import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/constants/app_sizes.dart';
+import '../../../../../core/constants/app_text_styles.dart';
+import '../../../../../core/widgets/radio_list_item.dart';
 
-class AttendancePage extends StatelessWidget {
+class SpendTimePage extends StatelessWidget {
   final String? selectedValue;
   final ValueChanged<String?> onSelected;
 
-  const AttendancePage({
+  const SpendTimePage({
     super.key,
     required this.selectedValue,
     required this.onSelected,
   });
 
-  static const attendanceOptions = [
-    'Weekly (almost every Sunday)',
-    'Biweekly (2-3 times a month)',
-    'Monthly (once a month)',
-    'Occasionally (festivals & special occasions)',
-    'Rarely',
+  static const spendTimeOptions = [
+    "Daily personal prayer and Bible reading",
+    "Attending church services regularly",
+    "Joining Bible study or small groups",
+    "Listening to worship music and Christian podcasts",
+    "Serving others through ministry",
+    "Fellowship with other believers",
   ];
 
   @override
@@ -32,7 +33,7 @@ class AttendancePage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
-              'How often do you attend church services?',
+              "How do you like to spend time with God?",
               style: AppTextStyles.heading(context),
             ),
           ),
@@ -40,13 +41,13 @@ class AttendancePage extends StatelessWidget {
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: attendanceOptions.length,
+            itemCount: spendTimeOptions.length,
             separatorBuilder: (_, __) =>
             const Divider(height: 0, color: AppColors.border),
             itemBuilder: (context, index) => RadioListItem<String>(
-              value: attendanceOptions[index],
+              value: spendTimeOptions[index],
               groupValue: selectedValue,
-              label: attendanceOptions[index],
+              label: spendTimeOptions[index],
               onChanged: onSelected,
             ),
           ),

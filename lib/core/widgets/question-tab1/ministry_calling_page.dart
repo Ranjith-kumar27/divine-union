@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_sizes.dart';
-import '../../../../core/constants/app_text_styles.dart';
-import '../../../../core/widgets/radio_list_item.dart';
+import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/constants/app_sizes.dart';
+import '../../../../../core/constants/app_text_styles.dart';
+import '../../../../../core/widgets/radio_list_item.dart';
 
-class CareerApproachPage extends StatelessWidget {
+class MinistryCallingPage extends StatelessWidget {
   final String? selectedValue;
   final ValueChanged<String?> onSelected;
 
-  const CareerApproachPage({
+  const MinistryCallingPage({
     super.key,
     required this.selectedValue,
     required this.onSelected,
   });
 
   static const options = [
-    "Very ambitious - career is a top priority",
-    "Balanced - both career and family matter equally",
-    "Family-focused - career supports our family goals",
-    "Service-oriented - work is my way of serving God",
-    "Still figuring out my path",
+    "Yes, I have a clear calling",
+    "I’m exploring different ways to serve",
+    "Not sure yet, but open to discovering",
+    "No specific calling at this time",
   ];
 
   @override
@@ -31,12 +30,11 @@ class CareerApproachPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
-              "How would you describe your approach to career and work?",
+              "Do you feel called to any specific ministry or service?",
               style: AppTextStyles.heading(context),
             ),
           ),
           const SizedBox(height: AppSizes.largeSpacing),
-
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),

@@ -1,28 +1,21 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_sizes.dart';
-import '../../../../core/constants/app_text_styles.dart';
-import '../../../../core/widgets/radio_list_item.dart';
+import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/constants/app_sizes.dart';
+import '../../../../../core/constants/app_text_styles.dart';
+import '../../../../../core/widgets/radio_list_item.dart';
 
-class SpendTimePage extends StatelessWidget {
+class InvolvementPage extends StatelessWidget {
   final String? selectedValue;
   final ValueChanged<String?> onSelected;
 
-  const SpendTimePage({
+  const InvolvementPage({
     super.key,
     required this.selectedValue,
     required this.onSelected,
   });
 
-  static const spendTimeOptions = [
-    "Daily personal prayer and Bible reading",
-    "Attending church services regularly",
-    "Joining Bible study or small groups",
-    "Listening to worship music and Christian podcasts",
-    "Serving others through ministry",
-    "Fellowship with other believers",
-  ];
+  static const options = ['Yes', 'No'];
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +26,7 @@ class SpendTimePage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
-              "How do you like to spend time with God?",
+              'Are you involved in any church activities or ministries?',
               style: AppTextStyles.heading(context),
             ),
           ),
@@ -41,13 +34,13 @@ class SpendTimePage extends StatelessWidget {
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: spendTimeOptions.length,
+            itemCount: options.length,
             separatorBuilder: (_, __) =>
             const Divider(height: 0, color: AppColors.border),
             itemBuilder: (context, index) => RadioListItem<String>(
-              value: spendTimeOptions[index],
+              value: options[index],
               groupValue: selectedValue,
-              label: spendTimeOptions[index],
+              label: options[index],
               onChanged: onSelected,
             ),
           ),

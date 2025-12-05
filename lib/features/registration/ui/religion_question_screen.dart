@@ -4,24 +4,23 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/app_strings.dart';
-import '../../../core/widgets/alcohol_preference_page.dart';
-import '../../../core/widgets/attendance_page.dart';
-import '../../../core/widgets/career_approach_page.dart';
-import '../../../core/widgets/dietary_preference_page.dart';
-import '../../../core/widgets/education_background_page.dart';
-import '../../../core/widgets/faith_journey_page.dart';
-import '../../../core/widgets/future_partner_denomination_page.dart';
-import '../../../core/widgets/involvement_page.dart';
-import '../../../core/widgets/lifestyle_values_page.dart';
-import '../../../core/widgets/ministry_calling_page.dart';
-import '../../../core/widgets/relocation_preference_page.dart';
+import '../../../core/widgets/question-tab1/alcohol_preference_page.dart';
+import '../../../core/widgets/question-tab1/attendance_page.dart';
+import '../../../core/widgets/question-tab1/career_approach_page.dart';
+import '../../../core/widgets/question-tab1/dietary_preference_page.dart';
+import '../../../core/widgets/question-tab1/education_background_page.dart';
+import '../../../core/widgets/question-tab1/faith_journey_page.dart';
+import '../../../core/widgets/question-tab1/future_partner_denomination_page.dart';
+import '../../../core/widgets/question-tab1/involvement_page.dart';
+import '../../../core/widgets/question-tab1/lifestyle_values_page.dart';
+import '../../../core/widgets/question-tab1/ministry_calling_page.dart';
+import '../../../core/widgets/question-tab1/relocation_preference_page.dart';
+import '../../../core/widgets/question-tab1/spend_time_page.dart';
+import '../../../core/widgets/question-tab1/tradition_page.dart';
+import '../../../core/widgets/question-tab1/work_location_page.dart';
+import '../../../core/widgets/question-tab1/work_role_page.dart';
 import '../../../core/widgets/rounded_button.dart';
-import '../../../core/widgets/spend_time_page.dart';
-import '../../../core/widgets/tradition_page.dart';
-import '../../../core/widgets/work_location_page.dart';
-import '../../../core/widgets/work_role_page.dart';
 import '../bloc/registration_bloc.dart';
 import '../bloc/registration_event.dart';
 
@@ -58,78 +57,22 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
   // Multi-select lifestyle
   List<String> _selectedLifestyleValues = [];
 
-  // Helpers
-  int get _pageCount => _pages.length;
-  late final List<Widget> _pages = [
-    TraditionPage(
-      selectedValue: _selectedTradition,
-      onSelected: (v) => setState(() => _selectedTradition = v),
-    ),
-    AttendancePage(
-      selectedValue: _selectedAttendance,
-      onSelected: (v) => setState(() => _selectedAttendance = v),
-    ),
-    InvolvementPage(
-      selectedValue: _selectedChurchActivities,
-      onSelected: (v) => setState(() => _selectedChurchActivities = v),
-    ),
-    FaithJourneyPage(
-      selectedValue: _selectedFaithJourney,
-      onSelected: (v) => setState(() => _selectedFaithJourney = v),
-    ),
-    SpendTimePage(
-      selectedValue: _selectedSpendTime,
-      onSelected: (v) => setState(() => _selectedSpendTime = v),
-    ),
-    FuturePartnerDenominationPage(
-      selectedValue: _selectedFuturePartnerDenomination,
-      onSelected: (v) => setState(() => _selectedFuturePartnerDenomination = v),
-    ),
-    MinistryCallingPage(
-      selectedValue: _selectedMinistryCalling,
-      onSelected: (v) => setState(() => _selectedMinistryCalling = v),
-    ),
-    EducationBackgroundPage(
-      selectedValue: _selectedEducationBackground,
-      onSelected: (v) => setState(() => _selectedEducationBackground = v),
-    ),
-    WorkRolePage(
-      selectedValue: _selectedWorkRole,
-      onSelected: (v) => setState(() => _selectedWorkRole = v),
-    ),
-    WorkLocationPage(
-      selectedCity: _selectedWorkCity,
-      selectedCountry: _selectedWorkCountry,
-      onCitySelected: (v) => setState(() => _selectedWorkCity = v),
-      onCountrySelected: (v) => setState(() => _selectedWorkCountry = v),
-    ),
-    CareerApproachPage(
-      selectedValue: _selectedCareerApproach,
-      onSelected: (v) => setState(() => _selectedCareerApproach = v),
-    ),
-    RelocationPreferencePage(
-      selectedValue: _selectedRelocationPreference,
-      onSelected: (v) => setState(() => _selectedRelocationPreference = v),
-    ),
-    DietaryPreferencePage(
-      selectedValue: _selectedDietaryPreference,
-      onSelected: (v) => setState(() => _selectedDietaryPreference = v),
-    ),
-    AlcoholPreferencePage(
-      selectedValue: _selectedAlcoholPreference,
-      onSelected: (v) => setState(() => _selectedAlcoholPreference = v),
-    ),
-    LifestyleValuesPage(
-      selectedValues: _selectedLifestyleValues,
-      onSelectionChanged: (list) =>
-          setState(() => _selectedLifestyleValues = list),
-    ),
-  ];
+  // Helper methods
+  void _handleBack() {
+    if (_currentPage > 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      // If we're on the first page, close the entire screen
+      Navigator.pop(context);
+    }
+  }
 
-  // Navigate to next page or submit when last
   void _handleNext() {
-    final lastIndex = _pageCount - 1;
-    if (_currentPage < lastIndex) {
+    final lastIndex = 15; // There are 15 pages (0-14)
+    if (_currentPage < lastIndex - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -196,8 +139,7 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
       case 13:
         return _selectedAlcoholPreference != null;
       case 14:
-        // lifestyle values page: allow empty or require at least one? design didn't force — we'll require at least 0 selectable (allow next even if empty)
-        // If you want to require at least one selection, change to: return _selectedLifestyleValues.isNotEmpty;
+        // lifestyle values page: allow empty
         return true;
       default:
         return true;
@@ -230,134 +172,167 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Because _pages uses state variables in constructors, rebuild the list on each build
-    // to ensure widgets receive updated values / callbacks.
-    final pages = [
-      TraditionPage(
-        selectedValue: _selectedTradition,
-        onSelected: (v) => setState(() => _selectedTradition = v),
-      ),
-      AttendancePage(
-        selectedValue: _selectedAttendance,
-        onSelected: (v) => setState(() => _selectedAttendance = v),
-      ),
-      InvolvementPage(
-        selectedValue: _selectedChurchActivities,
-        onSelected: (v) => setState(() => _selectedChurchActivities = v),
-      ),
-      FaithJourneyPage(
-        selectedValue: _selectedFaithJourney,
-        onSelected: (v) => setState(() => _selectedFaithJourney = v),
-      ),
-      SpendTimePage(
-        selectedValue: _selectedSpendTime,
-        onSelected: (v) => setState(() => _selectedSpendTime = v),
-      ),
-      FuturePartnerDenominationPage(
-        selectedValue: _selectedFuturePartnerDenomination,
-        onSelected: (v) =>
-            setState(() => _selectedFuturePartnerDenomination = v),
-      ),
-      MinistryCallingPage(
-        selectedValue: _selectedMinistryCalling,
-        onSelected: (v) => setState(() => _selectedMinistryCalling = v),
-      ),
-      EducationBackgroundPage(
-        selectedValue: _selectedEducationBackground,
-        onSelected: (v) => setState(() => _selectedEducationBackground = v),
-      ),
-      WorkRolePage(
-        selectedValue: _selectedWorkRole,
-        onSelected: (v) => setState(() => _selectedWorkRole = v),
-      ),
-      WorkLocationPage(
-        selectedCity: _selectedWorkCity,
-        selectedCountry: _selectedWorkCountry,
-        onCitySelected: (v) => setState(() => _selectedWorkCity = v),
-        onCountrySelected: (v) => setState(() => _selectedWorkCountry = v),
-      ),
-      CareerApproachPage(
-        selectedValue: _selectedCareerApproach,
-        onSelected: (v) => setState(() => _selectedCareerApproach = v),
-      ),
-      RelocationPreferencePage(
-        selectedValue: _selectedRelocationPreference,
-        onSelected: (v) => setState(() => _selectedRelocationPreference = v),
-      ),
-      DietaryPreferencePage(
-        selectedValue: _selectedDietaryPreference,
-        onSelected: (v) => setState(() => _selectedDietaryPreference = v),
-      ),
-      AlcoholPreferencePage(
-        selectedValue: _selectedAlcoholPreference,
-        onSelected: (v) => setState(() => _selectedAlcoholPreference = v),
-      ),
-      LifestyleValuesPage(
-        selectedValues: _selectedLifestyleValues,
-        onSelectionChanged: (list) =>
-            setState(() => _selectedLifestyleValues = list),
-      ),
-    ];
-
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
-        leadingWidth: 80,
-        leading: Container(
-          margin: const EdgeInsets.only(left: 8, top: 6),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.border),
-          ),
-          child: IconButton(
-            icon: SvgPicture.asset(AppAssets.arrowRight),
-            onPressed: () => Navigator.pop(context),
+        leadingWidth: 55,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 12, top: 12),
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.border),
+            ),
+            child: IconButton(
+              icon: SvgPicture.asset(AppAssets.arrowRight),
+              onPressed: _handleBack,
+            ),
           ),
         ),
         actions: [
-          // Optional Skip action shown in designs
           TextButton(
             onPressed: () {
-              // If you want Skip to jump to end / submit, implement here.
-              // For now it simply advances to next page.
-              final lastIndex = pages.length - 1;
-              if (_currentPage < lastIndex) {
-                _pageController.animateToPage(
-                  _currentPage + 1,
+              if (_currentPage < 14) {
+                _pageController.nextPage(
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeInOut,
                 );
               }
             },
-            child: const Text('Skip', style: TextStyle(color: Colors.grey)),
+            child: const Text(
+              'Skip',
+              style: TextStyle(color: Colors.grey, fontSize: 15),
+            ),
           ),
         ],
       ),
+
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: AppSizes.screenTopSpacing),
-            _buildPageIndicator(),
-            const SizedBox(height: AppSizes.largeSpacing),
-
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: (index) => setState(() => _currentPage = index),
-                children: pages,
+            /// ---------- Page Indicator ----------
+            Padding(
+              padding: const EdgeInsets.only(top: 24, bottom: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  3,
+                  (index) => Container(
+                    width: 110,
+                    height: 6,
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    decoration: BoxDecoration(
+                      color: _currentPage ~/ 5 == index
+                          ? AppColors.primary
+                          : AppColors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSizes.horizontalPadding,
-                vertical: AppSizes.verticalPadding,
+            /// ---------- Pages ----------
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onPageChanged: (i) => setState(() => _currentPage = i),
+                  children: [
+                    TraditionPage(
+                      selectedValue: _selectedTradition,
+                      onSelected: (v) => setState(() => _selectedTradition = v),
+                    ),
+                    AttendancePage(
+                      selectedValue: _selectedAttendance,
+                      onSelected: (v) =>
+                          setState(() => _selectedAttendance = v),
+                    ),
+                    InvolvementPage(
+                      selectedValue: _selectedChurchActivities,
+                      onSelected: (v) =>
+                          setState(() => _selectedChurchActivities = v),
+                    ),
+                    FaithJourneyPage(
+                      selectedValue: _selectedFaithJourney,
+                      onSelected: (v) =>
+                          setState(() => _selectedFaithJourney = v),
+                    ),
+                    SpendTimePage(
+                      selectedValue: _selectedSpendTime,
+                      onSelected: (v) => setState(() => _selectedSpendTime = v),
+                    ),
+                    FuturePartnerDenominationPage(
+                      selectedValue: _selectedFuturePartnerDenomination,
+                      onSelected: (v) => setState(
+                        () => _selectedFuturePartnerDenomination = v,
+                      ),
+                    ),
+                    MinistryCallingPage(
+                      selectedValue: _selectedMinistryCalling,
+                      onSelected: (v) =>
+                          setState(() => _selectedMinistryCalling = v),
+                    ),
+                    EducationBackgroundPage(
+                      selectedValue: _selectedEducationBackground,
+                      onSelected: (v) =>
+                          setState(() => _selectedEducationBackground = v),
+                    ),
+                    WorkRolePage(
+                      selectedValue: _selectedWorkRole,
+                      onSelected: (v) => setState(() => _selectedWorkRole = v),
+                    ),
+                    WorkLocationPage(
+                      selectedCity: _selectedWorkCity,
+                      selectedCountry: _selectedWorkCountry,
+                      onCitySelected: (v) =>
+                          setState(() => _selectedWorkCity = v),
+                      onCountrySelected: (v) =>
+                          setState(() => _selectedWorkCountry = v),
+                    ),
+                    CareerApproachPage(
+                      selectedValue: _selectedCareerApproach,
+                      onSelected: (v) =>
+                          setState(() => _selectedCareerApproach = v),
+                    ),
+                    RelocationPreferencePage(
+                      selectedValue: _selectedRelocationPreference,
+                      onSelected: (v) =>
+                          setState(() => _selectedRelocationPreference = v),
+                    ),
+                    DietaryPreferencePage(
+                      selectedValue: _selectedDietaryPreference,
+                      onSelected: (v) =>
+                          setState(() => _selectedDietaryPreference = v),
+                    ),
+                    AlcoholPreferencePage(
+                      selectedValue: _selectedAlcoholPreference,
+                      onSelected: (v) =>
+                          setState(() => _selectedAlcoholPreference = v),
+                    ),
+                    LifestyleValuesPage(
+                      selectedValues: _selectedLifestyleValues,
+                      onSelectionChanged: (v) =>
+                          setState(() => _selectedLifestyleValues = v),
+                    ),
+                  ],
+                ),
               ),
-              child: RoundedButton(
-                label: AppStrings.next,
-                onPressed: _isNextEnabled() ? _handleNext : null,
+            ),
+
+            /// ---------- Bottom Next Button ----------
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
+              child: SizedBox(
+                width: double.infinity,
+                child: RoundedButton(
+                  label: AppStrings.next,
+                  onPressed: _isNextEnabled() ? _handleNext : null,
+                ),
               ),
             ),
           ],

@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_sizes.dart';
-import '../../../../core/constants/app_text_styles.dart';
-import '../../../../core/widgets/radio_list_item.dart';
+import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/constants/app_sizes.dart';
+import '../../../../../core/constants/app_text_styles.dart';
+import '../../../../../core/widgets/radio_list_item.dart';
 
-class RelocationPreferencePage extends StatelessWidget {
+class FuturePartnerDenominationPage extends StatelessWidget {
   final String? selectedValue;
   final ValueChanged<String?> onSelected;
 
-  const RelocationPreferencePage({
+  const FuturePartnerDenominationPage({
     super.key,
     required this.selectedValue,
     required this.onSelected,
   });
 
   static const options = [
-    "I’m excited to move anywhere God leads us",
-    "I’m open to moving within India",
-    "I’d consider international opportunities (US/Canada/Australia)",
-    "I prefer staying in my current region",
-    "I prefer staying close to family and roots",
-    "I’m flexible but would want to discuss together",
+    "I’d strongly prefer someone from the same tradition as me",
+    "I’m open to other Christian denominations",
+    "Faith matters more than specific denomination",
+    "I’d like to learn about their tradition together",
   ];
 
   @override
@@ -32,12 +30,11 @@ class RelocationPreferencePage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
-              "When it comes to relocating for work or family?",
+              "When it comes to your future partner's denomination",
               style: AppTextStyles.heading(context),
             ),
           ),
           const SizedBox(height: AppSizes.largeSpacing),
-
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
