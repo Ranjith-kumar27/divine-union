@@ -218,65 +218,114 @@ class _ProfileTypeScreenState extends State<ProfileTypeScreen> {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(AppSizes.cardRadius),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isSelected
-                    ? AppColors.primary.withOpacity(.15)
-                    : AppColors.surface,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // CARD
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: isSelected ? AppColors.primary : AppColors.border,
+                width: isSelected ? 2 : 1,
               ),
-              child: Center(child: Image.asset(iconPath, width: 22)),
+              borderRadius: BorderRadius.circular(AppSizes.cardRadius),
+              color: Colors.white,
             ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Text(
-                  title,
-                  style: AppTextStyles.bold(context).copyWith(
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
                     color: isSelected
-                        ? AppColors.primary
-                        : AppColors.textPrimary,
+                        ? AppColors.primary.withOpacity(.15)
+                        : AppColors.surface,
                   ),
+                  child: Center(child: Image.asset(iconPath, width: 22)),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: AppTextStyles.body(context).copyWith(
-                    color: isSelected
-                        ? AppColors.textPrimary
-                        : AppColors.textSecondary,
-                  ),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: AppTextStyles.bold(context).copyWith(
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: AppTextStyles.body(context).copyWith(
+                        color: isSelected
+                            ? AppColors.textPrimary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
+                const Spacer(),
               ],
             ),
-            const Spacer(),
-            if (isSelected)
-              Container(
-                width: 22,
-                height: 22,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.primary,
+          ),
+
+          /// ---- TOP RIGHT ROUNDED CORNER PATCH WITH TICK ----
+          // ---- TOP RIGHT TRIANGLE WITH ROUNDED OUTER CORNER ----
+          if (isSelected)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(
+                    12,
+                  ), // <-- Rounded outer corner here
                 ),
-                child: const Icon(Icons.check, size: 14, color: Colors.white),
+                child: CustomPaint(
+                  size: const Size(42, 42),
+                  painter: _TrianglePainter(AppColors.primary),
+                  child: const SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 6, right: 6),
+                        child: Icon(Icons.check, size: 20, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
+}
+
+class _TrianglePainter extends CustomPainter {
+  final Color color;
+
+  _TrianglePainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color;
+
+    final path = Path()
+      ..moveTo(size.width, 0) // keep angle EXACT same
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, 0)
+      ..close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
 }
