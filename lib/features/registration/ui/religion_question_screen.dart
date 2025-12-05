@@ -245,13 +245,13 @@ class _ReligionQuestionScreenState extends State<ReligionQuestionScreen> {
       case 25:
         return _selectedJoyTwoItems.isNotEmpty;
       case 26:
-        return _selectedDifferencesInPartner != null;
-      case 27:
-        return _selectedDifficultToAccept.isNotEmpty;
-      case 28:
-        return _selectedLifePartnerValues.isNotEmpty;
-      case 29:
         return _selectedChristCenteredLife.isNotEmpty;
+      case 27:
+        return _selectedLifePartnerValues.isNotEmpty;
+      case 28:
+        return _selectedDifferencesInPartner != null;
+      case 29:
+        return  _selectedDifficultToAccept.isNotEmpty;
       case 30:
         return _partnerAgeRange != null;
       case 31:
