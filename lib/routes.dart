@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'features/registration/ui/splash_screen.dart';
+
 import 'features/registration/ui/mobile_number_screen.dart';
 import 'features/registration/ui/otp_screen.dart';
-import 'features/registration/ui/profile_type_screen.dart';
 import 'features/registration/ui/personal_details_screen.dart';
+import 'features/registration/ui/profile_type_screen.dart';
 import 'features/registration/ui/religion_question_screen.dart';
+import 'features/registration/ui/splash_screen.dart';
 
 class Routes {
   static const splash = '/';
@@ -29,10 +30,14 @@ class AppRouter {
       case Routes.personal:
         return MaterialPageRoute(builder: (_) => const PersonalDetailsScreen());
       case Routes.religion:
-        return MaterialPageRoute(builder: (_) => const ReligionQuestionScreen());
+        return MaterialPageRoute(
+          builder: (_) => const ReligionQuestionScreen(),
+        );
       default:
         return MaterialPageRoute(
-          builder: (_) => const Scaffold(body: Center(child: Text('Route not found'))),
+          builder: (_) => Scaffold(
+            body: Center(child: Text('Route not found: ${settings.name}')),
+          ),
         );
     }
   }

@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
@@ -13,6 +15,7 @@ import '../../../core/widgets/otp_widgets.dart';
 import '../../../routes.dart';
 import '../bloc/registration_bloc.dart';
 import '../bloc/registration_event.dart';
+import '../bloc/registration_state.dart';
 
 class OTPScreen extends StatefulWidget {
   const OTPScreen({super.key});
@@ -21,13 +24,15 @@ class OTPScreen extends StatefulWidget {
   State<OTPScreen> createState() => _OTPScreenState();
 }
 
-class _OTPScreenState extends State<OTPScreen> {
+class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
   late String mobile;
   final List<TextEditingController> _otpControllers = [];
   final List<FocusNode> _focusNodes = [];
   bool _canVerify = false;
   int _remainingSeconds = 30;
   late Timer _timer;
+  String? _appSignature;
+  bool _isResending = false;
 
   @override
   void didChangeDependencies() {
@@ -36,10 +41,33 @@ class _OTPScreenState extends State<OTPScreen> {
   }
 
   @override
+  void codeUpdated() {
+    final receivedCode = code!;
+    if (receivedCode.length == 6) {
+      _setOtpFromAutoFill(receivedCode);
+    }
+  }
+
+  void _setOtpFromAutoFill(String code) {
+    for (int i = 0; i < 6; i++) {
+      if (i < code.length) {
+        _otpControllers[i].text = code[i];
+      }
+    }
+    _updateVerificationState();
+  }
+
+  @override
   void initState() {
     super.initState();
     _initializeOtpFields();
     _startTimer();
+    _initSmsAutofill();
+    listenForCode();
+  }
+
+  void _initSmsAutofill() async {
+    _appSignature = await SmsAutoFill().getAppSignature;
   }
 
   void _initializeOtpFields() {
@@ -81,42 +109,55 @@ class _OTPScreenState extends State<OTPScreen> {
     }
   }
 
-  void _onKeypadPressed(String value) {
-    final emptyIndex = _otpControllers.indexWhere(
-      (controller) => controller.text.isEmpty,
-    );
-
-    if (emptyIndex != -1) {
-      _otpControllers[emptyIndex].text = value;
-      if (emptyIndex < 5) {
-        FocusScope.of(context).requestFocus(_focusNodes[emptyIndex + 1]);
-      }
-    }
-  }
-
-  void _onBackspacePressed() {
-    final lastFilledIndex = _otpControllers.lastIndexWhere(
-      (controller) => controller.text.isNotEmpty,
-    );
-
-    if (lastFilledIndex != -1) {
-      _otpControllers[lastFilledIndex].text = '';
-      if (lastFilledIndex > 0) {
-        FocusScope.of(context).requestFocus(_focusNodes[lastFilledIndex - 1]);
-      }
-    }
-  }
-
   void _verify() {
     final otp = _otpControllers.map((c) => c.text).join();
-    BlocProvider.of<RegistrationBloc>(context).add(OtpSubmitted(mobile, otp));
-    Navigator.of(context).pushReplacementNamed(Routes.profileType);
+
+    // Get the bloc
+    final bloc = BlocProvider.of<RegistrationBloc>(context);
+
+    // Get mobile from state
+    final mobileFromState = bloc.state.mobile;
+
+    // Use mobile from state if available, otherwise use the one from arguments
+    final mobileToVerify = mobileFromState.isNotEmpty
+        ? mobileFromState
+        : mobile;
+
+    // Dispatch event with mobile number
+    bloc.add(OtpSubmitted(mobileToVerify, otp));
   }
 
   void _resendCode() {
-    if (_remainingSeconds == 0) {
+    if (_remainingSeconds == 0 && !_isResending) {
+      setState(() {
+        _isResending = true;
+      });
+
+      // Get the bloc
+      final bloc = BlocProvider.of<RegistrationBloc>(context);
+
+      // Get mobile from state
+      final mobileFromState = bloc.state.mobile;
+
+      // Use mobile from state if available, otherwise use the one from arguments
+      final mobileToResend = mobileFromState.isNotEmpty
+          ? mobileFromState
+          : mobile;
+
+      // Dispatch resend OTP event
+      bloc.add(ResendOtp(mobileToResend));
+
+      // Restart timer
       _startTimer();
-      // TODO: Implement resend OTP API call
+
+      // Reset resending flag after a delay
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          setState(() {
+            _isResending = false;
+          });
+        }
+      });
     }
   }
 
@@ -129,6 +170,8 @@ class _OTPScreenState extends State<OTPScreen> {
     for (var focusNode in _focusNodes) {
       focusNode.dispose();
     }
+    SmsAutoFill().unregisterListener();
+    cancel();
     super.dispose();
   }
 
@@ -136,93 +179,129 @@ class _OTPScreenState extends State<OTPScreen> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leadingWidth: 80,
-        leading: Container(
-          margin: const EdgeInsets.only(
-            left: 8.0,
-            top: 6.0,
-            bottom: 0.0,
-            right: 6.0,
-          ),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.border, width: 1.0),
-          ),
-          child: IconButton(
-            icon: SvgPicture.asset(AppAssets.arrowRight),
-            onPressed: () => Navigator.of(context).pop(),
-            padding: const EdgeInsets.all(8.0),
+    return BlocListener<RegistrationBloc, RegistrationState>(
+      listener: (context, state) {
+        if (state.status == RegistrationStatus.verified) {
+          // Navigate to profile type screen on successful verification
+          Navigator.of(context).pushReplacementNamed(Routes.profileType);
+        } else if (state.status == RegistrationStatus.failure &&
+            state.error != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.error!),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leadingWidth: 80,
+          leading: Container(
+            margin: const EdgeInsets.only(
+              left: 8.0,
+              top: 6.0,
+              bottom: 0.0,
+              right: 6.0,
+            ),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.border, width: 1.0),
+            ),
+            child: IconButton(
+              icon: SvgPicture.asset(AppAssets.arrowRight),
+              onPressed: () => Navigator.of(context).pop(),
+              padding: const EdgeInsets.all(8.0),
+            ),
           ),
         ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSizes.horizontalPadding,
+        body: BlocBuilder<RegistrationBloc, RegistrationState>(
+          builder: (context, state) {
+            return SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.horizontalPadding,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: screenHeight * 0.04),
+                            Text(
+                              AppStrings.verifyContinue,
+                              style: AppTextStyles.heading(context),
+                            ),
+                            SizedBox(height: screenHeight * 0.02),
+                            Text(
+                              AppStrings.otpDescription,
+                              style: AppTextStyles.body(context),
+                            ),
+                            SizedBox(height: screenHeight * 0.04),
+                            // Using extracted OTP widget
+                            OtpFieldRow(
+                              controllers: _otpControllers,
+                              focusNodes: _focusNodes,
+                              onFieldChangedWithIndex: (index) {
+                                final value = _otpControllers[index].text;
+                                _handleOtpInput(value, index);
+                              },
+                            ),
+                            SizedBox(height: screenHeight * 0.02),
+                            // Show loading when resending OTP
+                            _isResending
+                                ? Padding(
+                                    padding: const EdgeInsets.only(left: 18.0),
+                                    child: Row(
+                                      children: [
+                                        const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          'Resending OTP...',
+                                          style: AppTextStyles.body(
+                                            context,
+                                          ).copyWith(color: AppColors.primary),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : OtpTimerWidget(
+                                    remainingSeconds: _remainingSeconds,
+                                    onResend: _resendCode,
+                                    canResend: _remainingSeconds == 0,
+                                  ),
+                            SizedBox(height: screenHeight * 0.06),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: screenHeight * 0.04),
-                      Text(
-                        AppStrings.verifyContinue,
-                        style: AppTextStyles.heading(context),
-                      ),
-                      SizedBox(height: screenHeight * 0.02),
-                      Text(
-                        AppStrings.otpDescription,
-                        style: AppTextStyles.body(context),
-                      ),
-                      SizedBox(height: screenHeight * 0.04),
-                      // Using extracted OTP widget
-                      OtpFieldRow(
-                        controllers: _otpControllers,
-                        focusNodes: _focusNodes,
-                        onFieldChangedWithIndex: (index) {
-                          final value = _otpControllers[index].text;
-                          _handleOtpInput(value, index);
-                        },
-                      ),
-                      SizedBox(height: screenHeight * 0.02),
-                      // Add left padding to the timer
-                      // Padding(
-                      //   padding: const EdgeInsets.only(left: 18.0),
-                      //   // Adjust as needed
-                      //   child: OtpTimerWidget(
-                      //     remainingSeconds: _remainingSeconds,
-                      //     onResend: _resendCode,
-                      //     canResend: _remainingSeconds == 0,
-                      //   ),
-                      // ),
-                      OtpTimerWidget(
-                        remainingSeconds: _remainingSeconds,
-                        onResend: _resendCode,
-                        canResend: _remainingSeconds == 0,
-                      ),
-                      SizedBox(height: screenHeight * 0.06),
-                    ],
-                  ),
-                ),
+                  // Verify button section
+                  _buildVerifyButton(context, state),
+                ],
               ),
-            ),
-            // Verify button section
-            _buildVerifyButton(context),
-          ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildVerifyButton(BuildContext context) {
+  Widget _buildVerifyButton(BuildContext context, RegistrationState state) {
     final screenHeight = MediaQuery.of(context).size.height;
+    final isLoading = state.status == RegistrationStatus.loading;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -233,9 +312,9 @@ class _OTPScreenState extends State<OTPScreen> {
         width: double.infinity,
         height: screenHeight * 0.06,
         child: ElevatedButton(
-          onPressed: _canVerify ? _verify : null,
+          onPressed: (_canVerify && !isLoading) ? _verify : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: _canVerify
+            backgroundColor: (_canVerify && !isLoading)
                 ? AppColors.primary
                 : AppColors.disabled,
             foregroundColor: Colors.white,
@@ -247,10 +326,16 @@ class _OTPScreenState extends State<OTPScreen> {
             disabledBackgroundColor: AppColors.disabled,
             disabledForegroundColor: AppColors.textSecondary,
           ),
-          child: Text(
-            AppStrings.verifyCode,
-            style: AppTextStyles.buttonLabel(context),
-          ),
+          child: isLoading
+              ? const SpinKitWave(
+                  color: Colors.white,
+                  size: 20.0,
+                  type: SpinKitWaveType.start,
+                )
+              : Text(
+                  AppStrings.verifyCode,
+                  style: AppTextStyles.buttonLabel(context),
+                ),
         ),
       ),
     );

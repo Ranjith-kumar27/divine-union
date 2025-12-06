@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/constants/app_assets.dart';
@@ -9,6 +10,7 @@ import '../../../core/constants/app_text_styles.dart';
 import '../../../routes.dart';
 import '../bloc/registration_bloc.dart';
 import '../bloc/registration_event.dart';
+import '../bloc/registration_state.dart';
 
 class MobileNumberScreen extends StatefulWidget {
   const MobileNumberScreen({super.key});
@@ -21,6 +23,7 @@ class _MobileNumberScreenState extends State<MobileNumberScreen> {
   final TextEditingController _mobileCtrl = TextEditingController();
   bool _valid = false;
   bool _isFocused = false;
+  bool _isNavigating = false;
 
   void _onChange() {
     final t = _mobileCtrl.text.replaceAll(RegExp(r'\s+'), '');
@@ -44,9 +47,8 @@ class _MobileNumberScreenState extends State<MobileNumberScreen> {
   }
 
   void _sendCode() {
-    final mobile = _mobileCtrl.text.trim();
+    final mobile = _mobileCtrl.text.trim().replaceAll(RegExp(r'\s+'), '');
     BlocProvider.of<RegistrationBloc>(context).add(MobileSubmitted(mobile));
-    Navigator.of(context).pushNamed(Routes.otp, arguments: mobile);
   }
 
   @override
@@ -76,113 +78,144 @@ class _MobileNumberScreenState extends State<MobileNumberScreen> {
           ),
         ),
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: screenHeight * 0.02),
-              // Main heading - Using Lora
-              Text(
-                AppStrings.journeyStartsHere,
-                style: AppTextStyles.heading(context),
+      body: BlocConsumer<RegistrationBloc, RegistrationState>(
+        listener: (context, state) {
+          // Handle OTP sent success - navigate to OTP screen
+          if (state.status == RegistrationStatus.otpSent && !_isNavigating) {
+            _isNavigating = true;
+            Future.delayed(Duration.zero, () {
+              Navigator.of(context).pushNamed(
+                Routes.otp,
+                arguments: _mobileCtrl.text.trim(),
+              ).then((_) {
+                _isNavigating = false;
+              });
+            });
+          } else if (state.status == RegistrationStatus.failure && state.error != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.error!),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 3),
               ),
-              SizedBox(height: screenHeight * 0.03),
-              // "Your mobile number" label - Using Inter Medium
-              Text(
-                AppStrings.yourMobileNumber,
-                style: AppTextStyles.label(
-                  context,
-                ).copyWith(color: AppColors.textPrimary),
-              ),
-              SizedBox(height: screenHeight * 0.01),
-              // Phone number input field
-              Container(
-                height: screenHeight * 0.06,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: _isFocused ? AppColors.primary : AppColors.border,
-                    width: 1.0,
+            );
+          }
+        },
+        builder: (context, state) {
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: screenHeight * 0.02),
+                  Text(
+                    AppStrings.journeyStartsHere,
+                    style: AppTextStyles.heading(context),
                   ),
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(width: screenHeight * 0.02),
-                    // Country code
-                    Text(
-                      AppStrings.countryCode,
-                      style: AppTextStyles.bold(context).copyWith(
-                        color: _mobileCtrl.text.isNotEmpty
-                            ? AppColors.textPrimary
-                            : AppColors.textSecondary,
+                  SizedBox(height: screenHeight * 0.03),
+                  Text(
+                    AppStrings.yourMobileNumber,
+                    style: AppTextStyles.label(
+                      context,
+                    ).copyWith(color: AppColors.textPrimary),
+                  ),
+                  SizedBox(height: screenHeight * 0.01),
+                  Container(
+                    height: screenHeight * 0.06,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: _isFocused ? AppColors.primary : AppColors.border,
+                        width: 1.0,
                       ),
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
-                    SizedBox(width: screenHeight * 0.02),
-                    // Vertical divider
-                    Container(
-                      width: 1,
-                      height: screenHeight * 0.03,
-                      color: AppColors.border,
-                    ),
-                    SizedBox(width: screenHeight * 0.02),
-                    // Phone number input
-                    Expanded(
-                      child: Focus(
-                        onFocusChange: (focus) {
-                          setState(() {
-                            _isFocused = focus;
-                          });
-                        },
-                        child: TextField(
-                          controller: _mobileCtrl,
-                          keyboardType: TextInputType.phone,
-                          style: AppTextStyles.bold(
-                            context,
-                          ).copyWith(color: AppColors.textPrimary),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            // hintText: AppStrings.enterMobileNumber,
-                            hintStyle: AppTextStyles.bold(context),
-                            counterText: '',
+                    child: Row(
+                      children: [
+                        SizedBox(width: screenHeight * 0.02),
+                        Text(
+                          AppStrings.countryCode,
+                          style: AppTextStyles.bold(context).copyWith(
+                            color: _mobileCtrl.text.isNotEmpty
+                                ? AppColors.textPrimary
+                                : AppColors.textSecondary,
                           ),
-                          maxLength: 10,
                         ),
-                      ),
+                        SizedBox(width: screenHeight * 0.02),
+                        Container(
+                          width: 1,
+                          height: screenHeight * 0.03,
+                          color: AppColors.border,
+                        ),
+                        SizedBox(width: screenHeight * 0.02),
+                        Expanded(
+                          child: Focus(
+                            onFocusChange: (focus) {
+                              setState(() {
+                                _isFocused = focus;
+                              });
+                            },
+                            child: TextField(
+                              controller: _mobileCtrl,
+                              keyboardType: TextInputType.phone,
+                              style: AppTextStyles.bold(
+                                context,
+                              ).copyWith(color: AppColors.textPrimary),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintStyle: AppTextStyles.bold(context),
+                                counterText: '',
+                              ),
+                              maxLength: 10,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              const Spacer(),
-              // Send Code Button - Using Inter SemiBold
-              SizedBox(
-                width: double.infinity,
-                height: screenHeight * 0.06,
-                child: ElevatedButton(
-                  onPressed: _valid ? _sendCode : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _valid
-                        ? AppColors.primary
-                        : AppColors.disabled,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
-                    padding: EdgeInsets.zero,
-                    disabledBackgroundColor: AppColors.disabled,
-                    disabledForegroundColor: AppColors.textSecondary,
                   ),
-                  child: Text(
-                    AppStrings.sendCode,
-                    style: AppTextStyles.buttonLabel(context),
-                  ),
-                ),
+                  const Spacer(),
+                  _buildSendButton(context, state),
+                  SizedBox(height: screenHeight * 0.04),
+                ],
               ),
-              SizedBox(height: screenHeight * 0.04),
-            ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSendButton(BuildContext context, RegistrationState state) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isLoading = state.status == RegistrationStatus.loading;
+
+    return SizedBox(
+      width: double.infinity,
+      height: screenHeight * 0.06,
+      child: ElevatedButton(
+        onPressed: (_valid && !isLoading) ? _sendCode : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: (_valid && !isLoading)
+              ? AppColors.primary
+              : AppColors.disabled,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
           ),
+          elevation: 0,
+          padding: EdgeInsets.zero,
+          disabledBackgroundColor: AppColors.disabled,
+          disabledForegroundColor: AppColors.textSecondary,
+        ),
+        child: isLoading
+            ? const SpinKitWave(
+          color: Colors.white,
+          size: 20.0,
+          type: SpinKitWaveType.start,
+        )
+            : Text(
+          AppStrings.sendCode,
+          style: AppTextStyles.buttonLabel(context),
         ),
       ),
     );
