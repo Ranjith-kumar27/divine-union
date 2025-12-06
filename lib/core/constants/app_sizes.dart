@@ -5,7 +5,7 @@ class AppSizes {
   // Spacing
   static const double horizontalPadding = 20.0;
   static const double verticalPadding = 16.0;
-  static const double screenTopSpacing = 24.0;
+  static const double screenTopSpacing = 42.0;
   static const double smallSpacing = 8.0;
   static const double mediumSpacing = 12.0;
   static const double largeSpacing = 24.0;

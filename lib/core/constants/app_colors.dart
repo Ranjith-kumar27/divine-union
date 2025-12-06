@@ -12,6 +12,8 @@ class AppColors {
 
   static const Color disabled = Color(0xFFCDCDFA); // #CDCDFA
 
+  static const Color liteDisabled = Color(0xFFF2F2FD);
+
   // Secondary text (labels, hints)
   static const Color textSecondary = Color(0xFF8A8A8F);
 

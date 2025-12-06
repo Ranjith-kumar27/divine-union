@@ -113,8 +113,7 @@ class _MobileNumberScreenState extends State<MobileNumberScreen> {
                     // Country code
                     Text(
                       AppStrings.countryCode,
-                      style: AppTextStyles.body(context).copyWith(
-                        fontWeight: FontWeight.w500,
+                      style: AppTextStyles.bold(context).copyWith(
                         color: _mobileCtrl.text.isNotEmpty
                             ? AppColors.textPrimary
                             : AppColors.textSecondary,
@@ -139,13 +138,13 @@ class _MobileNumberScreenState extends State<MobileNumberScreen> {
                         child: TextField(
                           controller: _mobileCtrl,
                           keyboardType: TextInputType.phone,
-                          style: AppTextStyles.body(
+                          style: AppTextStyles.bold(
                             context,
                           ).copyWith(color: AppColors.textPrimary),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             // hintText: AppStrings.enterMobileNumber,
-                            hintStyle: AppTextStyles.body(context),
+                            hintStyle: AppTextStyles.bold(context),
                             counterText: '',
                           ),
                           maxLength: 10,

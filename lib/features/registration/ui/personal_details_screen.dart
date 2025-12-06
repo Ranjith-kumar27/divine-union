@@ -1,283 +1,575 @@
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/widgets/custom_text_field.dart';
-import '../../../core/widgets/dropdown_field.dart';
-import '../../../core/widgets/rounded_button.dart';
-import '../../../core/widgets/bottom_sheet_list.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../bottomsheet/custom_bottom_sheet.dart';
+import '../../../core/constants/app_assets.dart';
+import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/widgets/rounded_button.dart';
 import '../../../routes.dart';
 import '../bloc/registration_bloc.dart';
 import '../bloc/registration_event.dart';
 
 class PersonalDetailsScreen extends StatefulWidget {
   const PersonalDetailsScreen({super.key});
+
   @override
   State<PersonalDetailsScreen> createState() => _PersonalDetailsScreenState();
 }
 
 class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
-  final _name = TextEditingController();
-  final _dob = TextEditingController();
-  final _height = TextEditingController();
-  String? _gender;
-  String? _marital;
-  String? _city;
-  String? _motherTongue;
-  List<String> _knownLanguages = [];
+  final _nameController = TextEditingController();
+  final _dobController = TextEditingController();
+  final _heightController = TextEditingController();
 
-  final maritalOptions = ['Single', 'Divorced', 'Widowed', 'Separated'];
-  final genderOptions = ['Male', 'Female'];
-  final motherTongueOptions = ['Tamil', 'Telugu', 'Malayalam', 'Hindi', 'English', 'Kannada'];
-  final languageOptions = [
-    'Tamil', 'English', 'Hindi', 'Telugu', 'Malayalam',
-    'Kannada', 'Bengali', 'Gujarati', 'Marathi', 'Other'
+  String? _selectedGender;
+  String? _selectedMaritalStatus;
+  String? _selectedLocation;
+  String? _selectedMotherTongue;
+  List<String> _selectedLanguages = [];
+
+  final List<String> _genderOptions = ['Male', 'Female'];
+  final List<String> _maritalOptions = [
+    'Single',
+    'Divorced',
+    'Widowed',
+    'Separated',
+  ];
+  final List<String> _locationOptions = [
+    'Chennai',
+    'Coimbatore',
+    'Madurai',
+    'Tiruchirappalli',
+    'Salem',
+    'Tirunelveli',
+    'Erode',
+    'Vellore',
+    'Thoothukkudi',
+    'Dindigul',
+    'Thanjavur',
+    'Hosur',
+    'Nagercoil',
+    'Kanchipuram',
+    'Kumarapalayam',
+    'Karaikkudi',
+    'Neyveli',
+    'Cuddalore',
+    'Ambur',
+    'Pollachi',
+    'Rajapalayam',
+    'Sivakasi',
+    'Pudukkottai',
+    'Vaniyambadi',
+    'Nagapattinam',
+    'Gudiyatham',
+    'Dharmapuri',
+    'Kumbakonam',
+    'Tiruvannamalai',
+    'Palladam',
+    'Arakkonam',
+    'Ariyalur',
+    'Coonoor',
+    'Dharapuram',
+    'Manapparai',
+    'Mayiladuthurai',
+    'Mettur',
+    'Mettupalayam',
+    'Panruti',
+    'Pattukkottai',
+    'Perambalur',
+    'Puliyankudi',
+    'Rasipuram',
+    'Sankari',
+    'Sathyamangalam',
+    'Sivaganga',
+    'Thiruvarur',
+    'Udumalaipettai',
+    'Valparai',
+    'Vedaranyam',
+    'Viluppuram',
+    'Virudhunagar',
+  ];
+  final List<String> _motherTongueOptions = [
+    'Tamil',
+    'Telugu',
+    'Malayalam',
+    'Hindi',
+    'English',
+    'Kannada',
+  ];
+  final List<String> _languageOptions = [
+    'Tamil',
+    'English',
+    'Hindi',
+    'Telugu',
+    'Malayalam',
+    'Kannada',
+    'Bengali',
+    'Gujarati',
+    'Marathi',
+    'Other',
   ];
 
-  // Tamil Nadu cities (sample list - you can add more)
-  final tamilNaduCities = [
-    'Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem',
-    'Tirunelveli', 'Erode', 'Vellore', 'Thoothukkudi', 'Dindigul',
-    'Thanjavur', 'Hosur', 'Nagercoil', 'Kanchipuram', 'Kumarapalayam',
-    'Karaikkudi', 'Neyveli', 'Cuddalore', 'Ambur', 'Pollachi',
-    'Rajapalayam', 'Sivakasi', 'Pudukkottai', 'Vaniyambadi', 'Nagapattinam',
-    'Gudiyatham', 'Dharmapuri', 'Kumbakonam', 'Tiruvannamalai', 'Palladam',
-    'Arakkonam', 'Ariyalur', 'Coonoor', 'Dharapuram', 'Manapparai',
-    'Mayiladuthurai', 'Mettur', 'Mettupalayam', 'Panruti', 'Pattukkottai',
-    'Perambalur', 'Puliyankudi', 'Rasipuram', 'Sankari', 'Sathyamangalam',
-    'Sivaganga', 'Thiruvarur', 'Udumalaipettai', 'Valparai', 'Vedaranyam',
-    'Viluppuram', 'Virudhunagar'
-  ];
+  bool get _isFormValid {
+    return _nameController.text.isNotEmpty &&
+        _dobController.text.isNotEmpty &&
+        _heightController.text.isNotEmpty &&
+        _isValidHeight(_heightController.text.trim()) &&
+        _selectedGender != null &&
+        _selectedMaritalStatus != null &&
+        _selectedLocation != null &&
+        _selectedMotherTongue != null &&
+        _selectedLanguages.isNotEmpty;
+  }
 
-  void _openBottomSheet({
-    required String title,
-    required List<String> options,
-    required String? selectedValue,
-    required Function(String?) onSelect,
-    bool isMultiSelect = false,
-    List<String>? multiSelectedValues,
-  }) {
+  bool _isValidHeight(String heightText) {
+    final height = double.tryParse(heightText);
+    return height != null && height > 0;
+  }
+
+  void _showDatePickerBottomSheet() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(AppSizes.fieldRadius * 2),
+            topRight: Radius.circular(AppSizes.fieldRadius * 2),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Select Date of Birth',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.close, color: AppColors.textSecondary),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            CalendarDatePicker2(
+              config: CalendarDatePicker2Config(
+                calendarType: CalendarDatePicker2Type.single,
+                selectedDayHighlightColor: AppColors.primary,
+                centerAlignModePicker: true,
+                controlsHeight: 50,
+                dayTextStyle: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 14.0,
+                  color: AppColors.textPrimary,
+                ),
+                disabledDayTextStyle: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 14.0,
+                  color: AppColors.textSecondary.withOpacity(0.5),
+                ),
+                currentDate: DateTime.now().subtract(
+                  const Duration(days: 365 * 18),
+                ),
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now(),
+                weekdayLabelTextStyle: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textSecondary,
+                ),
+                controlsTextStyle: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
+                yearTextStyle: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 14.0,
+                  color: AppColors.textPrimary,
+                ),
+                selectedYearTextStyle: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
                 ),
               ),
-              const Divider(height: 1),
-              if (!isMultiSelect)
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: options.length,
-                    itemBuilder: (context, index) {
-                      final option = options[index];
-                      return RadioListTile(
-                        title: Text(option),
-                        value: option,
-                        groupValue: selectedValue,
-                        onChanged: (value) {
-                          onSelect(value);
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
-                )
-              else
-                Expanded(
-                  child: StatefulBuilder(
-                    builder: (context, setState) {
-                      return Column(
-                        children: [
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: options.length,
-                              itemBuilder: (context, index) {
-                                final option = options[index];
-                                return CheckboxListTile(
-                                  title: Text(option),
-                                  value: multiSelectedValues?.contains(option) ?? false,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      if (value == true) {
-                                        multiSelectedValues?.add(option);
-                                      } else {
-                                        multiSelectedValues?.remove(option);
-                                      }
-                                    });
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  onSelect(multiSelectedValues?.join(', '));
-                                  Navigator.pop(context);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                ),
-                                child: const Text(
-                                  'Done',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
+              value: _parseDateFromText(_dobController.text),
+              onValueChanged: (dates) {
+                if (dates.isNotEmpty && dates.first != null) {
+                  final selectedDate = dates.first!;
+                  setState(() {
+                    _dobController.text =
+                        '${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}';
+                  });
+                  Navigator.pop(context);
+                }
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
     );
   }
 
-  void _openMarital() {
-    _openBottomSheet(
-      title: 'Marital Status',
-      options: maritalOptions,
-      selectedValue: _marital,
-      onSelect: (value) => setState(() => _marital = value),
+  List<DateTime?> _parseDateFromText(String text) {
+    try {
+      final parts = text.split('/');
+      if (parts.length == 3) {
+        final day = int.tryParse(parts[0]);
+        final month = int.tryParse(parts[1]);
+        final year = int.tryParse(parts[2]);
+
+        if (day != null && month != null && year != null) {
+          return [DateTime(year, month, day)];
+        }
+      }
+    } catch (e) {
+      // If parsing fails, return empty list
+    }
+    return [];
+  }
+
+  bool _isValidDate(String dateText) {
+    try {
+      final parts = dateText.split('/');
+      if (parts.length != 3) return false;
+
+      final day = int.tryParse(parts[0]);
+      final month = int.tryParse(parts[1]);
+      final year = int.tryParse(parts[2]);
+
+      if (day == null || month == null || year == null) return false;
+      if (month < 1 || month > 12) return false;
+      if (day < 1 || day > 31) return false;
+
+      final date = DateTime(year, month, day);
+      return date.year == year && date.month == month && date.day == day;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  void _showMaritalStatusBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: AppColors.disabled.withOpacity(0.5),
+      builder: (context) => CustomBottomSheet.maritalStatus(
+        selectedValue: _selectedMaritalStatus,
+        onSelect: (value) {
+          setState(() {
+            _selectedMaritalStatus = value;
+          });
+        },
+      ),
     );
   }
 
-  void _openGender() {
-    _openBottomSheet(
-      title: 'Gender',
-      options: genderOptions,
-      selectedValue: _gender,
-      onSelect: (value) => setState(() => _gender = value),
+  void _showLocationBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: AppColors.disabled.withOpacity(0.5),
+      builder: (context) => CustomBottomSheet.locationSelection(
+        title: 'Select City',
+        options: _locationOptions,
+        selectedValue: _selectedLocation,
+        onSelect: (selected) {
+          setState(() {
+            _selectedLocation = selected;
+          });
+        },
+      ),
     );
   }
 
-  void _openCity() {
-    _openBottomSheet(
-      title: 'Current Location',
-      options: tamilNaduCities,
-      selectedValue: _city,
-      onSelect: (value) => setState(() => _city = value),
+  void _showMotherTongueBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: AppColors.disabled.withOpacity(0.5),
+      builder: (context) => CustomBottomSheet.motherTongue(
+        options: _motherTongueOptions,
+        selectedValue: _selectedMotherTongue,
+        // Changed from selectedValues to selectedValue
+        onSelect: (selected) {
+          // Changed from onSelect to accept String instead of List<String>
+          setState(() {
+            _selectedMotherTongue = selected;
+          });
+        },
+      ),
     );
   }
 
-  void _openMotherTongue() {
-    _openBottomSheet(
-      title: 'Mother Tongue',
-      options: motherTongueOptions,
-      selectedValue: _motherTongue,
-      onSelect: (value) => setState(() => _motherTongue = value),
+  void _showKnownLanguagesBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CustomBottomSheet.knownLanguages(
+        options: _languageOptions,
+        selectedValues: _selectedLanguages,
+        onSelect: (values) {
+          setState(() {
+            _selectedLanguages = values;
+          });
+        },
+      ),
     );
   }
 
-  void _openKnownLanguages() {
-    _openBottomSheet(
-      title: 'Known Languages',
-      options: languageOptions,
-      selectedValue: null,
-      onSelect: (value) => setState(() {}),
-      isMultiSelect: true,
-      multiSelectedValues: _knownLanguages,
-    );
-  }
+  void _handleNext() {
+    if (!_isValidDate(_dobController.text.trim())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please enter a valid date (dd/mm/yyyy)'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
-  void _gotoNext() {
+    if (!_isValidHeight(_heightController.text.trim())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please enter a valid height'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final details = {
-      'name': _name.text.trim(),
-      'dob': _dob.text.trim(),
-      'height': _height.text.trim(),
-      'gender': _gender,
-      'marital': _marital,
-      'city': _city,
-      'motherTongue': _motherTongue,
-      'knownLanguages': _knownLanguages,
+      'name': _nameController.text.trim(),
+      'dob': _dobController.text.trim(),
+      'height': _heightController.text.trim(),
+      'gender': _selectedGender,
+      'maritalStatus': _selectedMaritalStatus,
+      'location': _selectedLocation,
+      'motherTongue': _selectedMotherTongue,
+      'knownLanguages': _selectedLanguages,
     };
-    BlocProvider.of<RegistrationBloc>(context).add(PersonalDetailsUpdated(details));
+
+    // Dispatch the event to update the state
+    BlocProvider.of<RegistrationBloc>(
+      context,
+    ).add(PersonalDetailsUpdated(details));
+
+    // Navigate to the next screen
     Navigator.of(context).pushNamed(Routes.religion);
   }
 
-  @override
-  void dispose() {
-    _name.dispose();
-    _dob.dispose();
-    _height.dispose();
-    super.dispose();
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 16.0,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textSecondary,
+        ),
+      ),
+    );
   }
 
-  Widget _buildDropdownField({
-    required String label,
-    required String? value,
-    required VoidCallback onTap,
-    bool showBorder = true,
+  Widget _buildTextField({
+    required String hint,
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    VoidCallback? onTap,
+    bool readOnly = false,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: AppSizes.fieldHeight,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: showBorder
-              ? Border.all(color: const Color(0xFFE0E0E6))
-              : null,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              value ?? label,
-              style: TextStyle(
-                color: value != null ? Colors.black : Colors.grey,
-                fontSize: 16,
+    return Container(
+      height: AppSizes.fieldHeight,
+      decoration: BoxDecoration(
+        color: AppColors.fieldBackground,
+        borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                controller: controller,
+                onTap: onTap,
+                readOnly: readOnly,
+                keyboardType: readOnly ? null : keyboardType,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: hint,
+                  hintStyle: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 16.0,
+                    color: AppColors.textSecondary.withOpacity(0.5),
+                  ),
+                ),
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ),
-            const Icon(
-              Icons.arrow_drop_down,
-              color: Colors.grey,
+          ),
+          if (onTap != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: IconButton(
+                icon: Icon(
+                  Icons.edit_calendar,
+                  color: AppColors.textSecondary.withOpacity(0.5),
+                  size: AppSizes.iconSizeMedium,
+                ),
+                onPressed: onTap,
+                padding: EdgeInsets.zero,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectionField({
+    required String title,
+    required String? value,
+    required String hint,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(title),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            height: AppSizes.fieldHeight,
+            decoration: BoxDecoration(
+              color: AppColors.fieldBackground,
+              borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
+              border: Border.all(color: AppColors.border),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value ?? hint,
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
+                      color: value != null
+                          ? AppColors.textPrimary
+                          : AppColors.textSecondary.withOpacity(0.5),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  icon: SvgPicture.asset(AppAssets.arrowDown),
+                  padding: const EdgeInsets.all(8.0),
+                  onPressed: onTap,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderSelection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Gender'),
+        const SizedBox(height: 10),
+
+        LayoutBuilder(
+          builder: (context, constraints) {
+            double itemWidth =
+                (constraints.maxWidth - 14) / 2; // 2 buttons + spacing
+
+            return Row(
+              children: [
+                _genderButton("Male", itemWidth),
+                const SizedBox(width: 12), // <-- SPACE BETWEEN BUTTONS
+                _genderButton("Female", itemWidth),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _genderButton(String gender, double width) {
+    final bool isSelected = _selectedGender == gender;
+
+    return SizedBox(
+      width: width,
+      height: 48,
+      child: ElevatedButton(
+        onPressed: () => setState(() => _selectedGender = gender),
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          side: BorderSide(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: isSelected ? 2 : 1,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              gender == "Male" ? AppAssets.male : AppAssets.female,
+              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              gender,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+                color: isSelected
+                    ? AppColors.textPrimary
+                    : AppColors.textSecondary,
+              ),
             ),
           ],
         ),
@@ -285,157 +577,276 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: const BackButton(color: Colors.black),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSizes.horizontalPadding),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 18),
-              Text(
-                "Let's begin with you! Tell us a bit about yourself.",
-                style: AppTextStyles.heading(context),
+  Widget _buildHeightField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Height'),
+        Row(
+          children: [
+            Container(
+              height: AppSizes.fieldHeight,
+              width: 60,
+              decoration: BoxDecoration(
+                color: AppColors.fieldBackground,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(AppSizes.fieldRadius),
+                  bottomLeft: Radius.circular(AppSizes.fieldRadius),
+                ),
+                border: Border.all(color: AppColors.border),
               ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                controller: _name,
-                hint: 'Name',
-                prefixIcon: Icons.person_outline,
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime(1995, 1, 1),
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime.now(),
-                  );
-                  if (picked != null) {
-                    _dob.text = '${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}';
-                  }
-                },
-                child: AbsorbPointer(
-                  child: CustomTextField(
-                    controller: _dob,
-                    hint: 'Date of Birth',
-                    prefixIcon: Icons.calendar_today_outlined,
+              child: Center(
+                child: Text(
+                  'ft',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
-              CustomTextField(
-                controller: _height,
-                hint: 'Height (ft)',
-                prefixIcon: Icons.height_outlined,
-              ),
-              const SizedBox(height: 12),
-              _buildDropdownField(
-                label: 'Gender',
-                value: _gender,
-                onTap: _openGender,
-              ),
-              const SizedBox(height: 12),
-              _buildDropdownField(
-                label: 'Marital status',
-                value: _marital,
-                onTap: _openMarital,
-              ),
-              const SizedBox(height: 12),
-              _buildDropdownField(
-                label: 'Current location',
-                value: _city,
-                onTap: _openCity,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Mother Tongue',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              _buildDropdownField(
-                label: 'Select mother tongue',
-                value: _motherTongue,
-                onTap: _openMotherTongue,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Known Languages',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              GestureDetector(
-                onTap: _openKnownLanguages,
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFE0E0E6)),
+            ),
+            Expanded(
+              child: Container(
+                height: AppSizes.fieldHeight,
+                decoration: BoxDecoration(
+                  color: AppColors.fieldBackground,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(AppSizes.fieldRadius),
+                    bottomRight: Radius.circular(AppSizes.fieldRadius),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  border: Border(
+                    top: BorderSide(color: AppColors.border),
+                    right: BorderSide(color: AppColors.border),
+                    bottom: BorderSide(color: AppColors.border),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        _knownLanguages.isNotEmpty
-                            ? _knownLanguages.join(', ')
-                            : 'Select known languages',
-                        style: TextStyle(
-                          color: _knownLanguages.isNotEmpty
-                              ? Colors.black
-                              : Colors.grey,
-                          fontSize: 16,
+                      Expanded(
+                        child: TextField(
+                          controller: _heightController,
+                          keyboardType: TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: '',
+                            hintStyle: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 16.0,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
                       ),
-                      if (_knownLanguages.isNotEmpty)
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: _knownLanguages
-                              .map((lang) => Chip(
-                            label: Text(lang),
-                            backgroundColor: Colors.blue.shade50,
-                            deleteIcon: const Icon(Icons.close, size: 16),
-                            onDeleted: () {
-                              setState(() {
-                                _knownLanguages.remove(lang);
-                              });
-                            },
-                          ))
-                              .toList(),
-                        ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 30),
-              RoundedButton(
-                label: 'Next',
-                onPressed: _gotoNext,
-                isEnabled: _name.text.isNotEmpty &&
-                    _dob.text.isNotEmpty &&
-                    _height.text.isNotEmpty &&
-                    _gender != null &&
-                    _marital != null &&
-                    _city != null &&
-                    _motherTongue != null &&
-                    _knownLanguages.isNotEmpty,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildKnownLanguagesField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Known languages'),
+        GestureDetector(
+          onTap: _showKnownLanguagesBottomSheet,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.fieldBackground,
+              borderRadius: BorderRadius.circular(AppSizes.fieldRadius),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: _selectedLanguages.isEmpty
+                      ? Text(
+                          "Select",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary.withOpacity(0.5),
+                          ),
+                        )
+                      : Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _selectedLanguages.map((lang) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    lang,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(
+                                        () => _selectedLanguages.remove(lang),
+                                      );
+                                    },
+                                    child: const Icon(Icons.close, size: 16),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                ),
+
+                /// Drop arrow
+                Padding(
+                  padding: const EdgeInsets.only(left: 8, top: 4),
+                  child: SvgPicture.asset(AppAssets.arrowDown),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _dobController.dispose();
+    _heightController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.scaffoldBackground,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leadingWidth: 80,
+        leading: Container(
+          margin: const EdgeInsets.only(left: 8.0, top: 6.0),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.border, width: 1.0),
+          ),
+          child: IconButton(
+            icon: SvgPicture.asset(
+              AppAssets.arrowRight,
+              color: AppColors.textPrimary,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+            padding: const EdgeInsets.all(8.0),
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.horizontalPadding,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: AppSizes.screenTopSpacing),
+              Text(
+                "Let's begin with you! Tell us a bit about yourself.",
+                style: AppTextStyles.heading(context),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: AppSizes.largeSpacing),
+
+              _buildSectionTitle('Name'),
+              _buildTextField(
+                hint: 'Type here',
+                controller: _nameController,
+                keyboardType: TextInputType.text,
+              ),
+              const SizedBox(height: AppSizes.largeSpacing),
+
+              _buildSectionTitle('Date of Birth'),
+              _buildTextField(
+                hint: 'dd/mm/yyyy',
+                controller: _dobController,
+                onTap: _showDatePickerBottomSheet,
+                keyboardType: TextInputType.datetime,
+              ),
+              const SizedBox(height: AppSizes.largeSpacing),
+
+              _buildHeightField(),
+              const SizedBox(height: AppSizes.largeSpacing),
+
+              _buildGenderSelection(),
+              const SizedBox(height: AppSizes.largeSpacing),
+
+              _buildSelectionField(
+                title: 'Marital status',
+                value: _selectedMaritalStatus,
+                hint: 'Select',
+                onTap: _showMaritalStatusBottomSheet,
+              ),
+              const SizedBox(height: AppSizes.largeSpacing),
+
+              _buildSelectionField(
+                title: 'Current location',
+                value: _selectedLocation,
+                hint: 'Select',
+                onTap: _showLocationBottomSheet,
+              ),
+              const SizedBox(height: AppSizes.largeSpacing),
+
+              _buildSelectionField(
+                title: 'Mother tongue',
+                value: _selectedMotherTongue,
+                hint: 'Select',
+                onTap: _showMotherTongueBottomSheet,
+              ),
+              const SizedBox(height: AppSizes.largeSpacing),
+
+              _buildKnownLanguagesField(),
+              const SizedBox(height: AppSizes.largeSpacing),
+
+              RoundedButton(
+                label: AppStrings.next,
+                onPressed: _isFormValid ? _handleNext : null,
+                backgroundColor: AppColors.primary,
+                textColor: Colors.white,
+                height: AppSizes.buttonHeight,
+                borderRadius: AppSizes.buttonRadius,
+                isEnabled: _isFormValid,
+              ),
+              const SizedBox(height: AppSizes.largeSpacing),
             ],
           ),
         ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../constants/app_colors.dart';
-import '../constants/app_text_styles.dart';
 import '../constants/app_sizes.dart';
+import '../constants/app_text_styles.dart';
 
 /// Reusable primary button matching Figma:
 /// - Height: 48px
@@ -15,6 +16,9 @@ class RoundedButton extends StatelessWidget {
   final double? width; // default to full width
   final Color? backgroundColor;
   final Color? disabledColor;
+  final Color? textColor; // Added parameter
+  final double? height; // Added parameter
+  final double? borderRadius; // Added parameter
 
   const RoundedButton({
     super.key,
@@ -24,33 +28,45 @@ class RoundedButton extends StatelessWidget {
     this.width,
     this.backgroundColor,
     this.disabledColor,
+    this.textColor,
+    this.height,
+    this.borderRadius,
   });
 
   @override
   Widget build(BuildContext context) {
-    final buttonChild = SizedBox(
-      height: AppSizes.buttonHeight,
+    final buttonHeight = height ?? AppSizes.buttonHeight;
+    final buttonRadius = borderRadius ?? AppSizes.buttonRadius;
+    final buttonTextColor = textColor ?? Colors.white;
+
+    // Use custom disabledColor if provided, otherwise use AppColors.disabled
+    final actualDisabledColor = disabledColor ?? AppColors.disabled;
+
+    return SizedBox(
+      height: buttonHeight,
       width: width ?? double.infinity,
       child: ElevatedButton(
         onPressed: isEnabled ? onPressed : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: isEnabled
               ? (backgroundColor ?? AppColors.primary)
-              : (disabledColor ?? AppColors.disabled),
+              : actualDisabledColor,
+          foregroundColor: buttonTextColor,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSizes.buttonRadius),
+            borderRadius: BorderRadius.circular(buttonRadius),
           ),
+          // Ensure disabled text color is also white
+          disabledBackgroundColor: actualDisabledColor,
+          disabledForegroundColor: Colors.white,
         ),
-        child:Text(
+        child: Text(
           label,
-          style: AppTextStyles.buttonLabel(context).copyWith(
-            color: isEnabled ? Colors.white : Colors.grey.shade400,
-          ),
+          style: AppTextStyles.buttonLabel(
+            context,
+          ).copyWith(color: isEnabled ? buttonTextColor : Colors.white),
         ),
       ),
     );
-
-    return buttonChild;
   }
 }
