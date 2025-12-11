@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkVerificationStatus() async {
     // Wait for splash duration
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(const Duration(milliseconds: 2000));
 
     if (!mounted) return;
 
@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
       );
     } else {
       // User not verified, go to mobile number screen
-      Navigator.of(context).pushReplacementNamed(Routes.mobileNumber);
+      Navigator.of(context).pushReplacementNamed(Routes.perfectMatch);
     }
   }
 

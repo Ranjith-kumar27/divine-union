@@ -95,7 +95,7 @@ class _ProfileTypeScreenState extends State<ProfileTypeScreen> {
                     _buildOptionCard(
                       title: AppStrings.forMe,
                       subtitle: AppStrings.forMeSubtitle,
-                      iconPath: AppAssets.personIcon,
+                      iconPath: AppAssets.forMeIcon,
                       isSelected: selectedType == "for_me",
                       onTap: () => _selectType("for_me"),
                     ),
@@ -106,7 +106,7 @@ class _ProfileTypeScreenState extends State<ProfileTypeScreen> {
                     _buildOptionCard(
                       title: AppStrings.forFamily,
                       subtitle: AppStrings.forFamilySubtitle,
-                      iconPath: AppAssets.personIcon,
+                      iconPath: AppAssets.forFamilyIcon,
                       isSelected: selectedType == "for_family",
                       onTap: () => _selectType("for_family"),
                     ),
@@ -116,23 +116,20 @@ class _ProfileTypeScreenState extends State<ProfileTypeScreen> {
                       const SizedBox(height: 30),
                       Text(
                         "I'm creating a profile for my",
-                        style: AppTextStyles.body(context),
+                        style: AppTextStyles.label(context),
                       ),
 
                       const SizedBox(height: 16),
 
                       LayoutBuilder(
                         builder: (context, constraints) {
-                          double itemWidth =
-                              (constraints.maxWidth - 32) /
-                              3; // 3 items per row
+                          double itemWidth = (constraints.maxWidth - 32) / 3;   // Perfect 3 grid
 
                           return Wrap(
                             spacing: 16,
                             runSpacing: 16,
                             children: relations.map((relation) {
-                              final bool isActive =
-                                  selectedRelation == relation;
+                              final bool isActive = selectedRelation == relation;
 
                               return SizedBox(
                                 width: itemWidth,
@@ -142,28 +139,25 @@ class _ProfileTypeScreenState extends State<ProfileTypeScreen> {
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
                                     backgroundColor: Colors.white,
-                                    foregroundColor: isActive
-                                        ? AppColors.primary
-                                        : AppColors.textPrimary,
+                                    foregroundColor: isActive ? AppColors.primary : AppColors.textPrimary,
                                     side: BorderSide(
-                                      color: isActive
-                                          ? AppColors.primary
-                                          : AppColors.border,
+                                      color: isActive ? AppColors.primary : AppColors.border,
                                       width: isActive ? 2 : 1,
                                     ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
-                                  child: Text(
-                                    relation,
-                                    style: AppTextStyles.body(context).copyWith(
-                                      fontWeight: isActive
-                                          ? FontWeight.w700
-                                          : FontWeight.w500,
-                                      color: isActive
-                                          ? AppColors.textPrimary
-                                          : AppColors.textSecondary,
+                                  child: FittedBox(                     // Auto fit text
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      relation,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,  // Prevent multi-line wrap
+                                      style: AppTextStyles.body(context).copyWith(
+                                        fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                                        color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -243,7 +237,7 @@ class _ProfileTypeScreenState extends State<ProfileTypeScreen> {
                         ? AppColors.primary.withOpacity(.15)
                         : AppColors.surface,
                   ),
-                  child: Center(child: Image.asset(iconPath, width: 22)),
+                  child: Center(child: Image.asset(iconPath, width: 54)),
                 ),
                 const SizedBox(width: 16),
                 Column(
