@@ -11,11 +11,11 @@ class AppTextStyles {
 
   // Responsive font size calculator
   static double _responsiveFontSize(
-    BuildContext context, {
-    required double heightFactor,
-    double minSize = 10.0,
-    double maxSize = 32.0,
-  }) {
+      BuildContext context, {
+        required double heightFactor,
+        double minSize = 10.0,
+        double maxSize = 32.0,
+      }) {
     final screenHeight = MediaQuery.of(context).size.height;
     return (screenHeight * heightFactor).clamp(minSize, maxSize);
   }
@@ -32,7 +32,6 @@ class AppTextStyles {
       ),
       height: AppSizes.headingLineHeight / AppSizes.headingFontSize,
       fontWeight: FontWeight.w600,
-      // Changed from w500 to w600 for emphasis
       letterSpacing: -0.01 * AppSizes.headingFontSize,
       color: AppColors.textPrimary,
     );
@@ -45,7 +44,7 @@ class AppTextStyles {
       fontSize: _responsiveFontSize(
         context,
         heightFactor: 0.018,
-        minSize: 14.0, // Increased min size from 12 to 14
+        minSize: 14.0,
         maxSize: 16.0,
       ),
       fontWeight: FontWeight.w400,
@@ -60,7 +59,7 @@ class AppTextStyles {
       fontSize: _responsiveFontSize(
         context,
         heightFactor: 0.02,
-        minSize: 16.0, // Increased from 14
+        minSize: 16.0,
         maxSize: 18.0,
       ),
       fontWeight: FontWeight.w600,
@@ -68,22 +67,22 @@ class AppTextStyles {
     );
   }
 
-  // Responsive small label (Medium weight for resend code)
+  // Responsive small label (Medium weight)
   static TextStyle label(BuildContext context) {
     return TextStyle(
       fontFamily: 'Inter',
       fontSize: _responsiveFontSize(
         context,
         heightFactor: 0.017,
-        minSize: 14.0, // Increased from 10-14 to 14-16 for medium size
+        minSize: 14.0,
         maxSize: 16.0,
       ),
-      fontWeight: FontWeight.w500, // Medium weight
+      fontWeight: FontWeight.w500,
       color: AppColors.textSecondary,
     );
   }
 
-  // NEW: Specific style for resend code text with primary color
+  // Style for resend code text with primary color
   static TextStyle resendCode(BuildContext context) {
     return TextStyle(
       fontFamily: 'Inter',
@@ -93,7 +92,7 @@ class AppTextStyles {
         minSize: 14.0,
         maxSize: 16.0,
       ),
-      fontWeight: FontWeight.w500, // Medium weight
+      fontWeight: FontWeight.w500,
       color: AppColors.primary,
     );
   }
@@ -133,8 +132,128 @@ class AppTextStyles {
     return TextStyle(
       fontFamily: 'Lora',
       fontSize: 28.0,
-      fontWeight: FontWeight.w600, // Changed to semi-bold for better visibility
+      fontWeight: FontWeight.w600,
       color: AppColors.textPrimary,
+    );
+  }
+
+  // Profile name text style
+  static TextStyle profileName(BuildContext context) {
+    return TextStyle(
+      fontFamily: 'Lora',
+      fontSize: _responsiveFontSize(
+        context,
+        heightFactor: 0.025,
+        minSize: 20.0,
+        maxSize: 24.0,
+      ),
+      fontWeight: FontWeight.w700,
+      color: Colors.white,
+    );
+  }
+
+  // Profile tag text style
+  static TextStyle profileTag(BuildContext context) {
+    return TextStyle(
+      fontFamily: 'Inter',
+      fontSize: _responsiveFontSize(
+        context,
+        heightFactor: 0.015,
+        minSize: 10.0,
+        maxSize: 12.0,
+      ),
+      fontWeight: FontWeight.w500,
+      color: Colors.white,
+    );
+  }
+
+  // Match percentage text style
+  static TextStyle matchPercentage(BuildContext context) {
+    return TextStyle(
+      fontFamily: 'Inter',
+      fontSize: _responsiveFontSize(
+        context,
+        heightFactor: 0.022,
+        minSize: 18.0,
+        maxSize: 20.0,
+      ),
+      fontWeight: FontWeight.w700,
+      color: AppColors.primary,
+    );
+  }
+
+  // Premium badge text style
+  static TextStyle premiumBadge(BuildContext context) {
+    return TextStyle(
+      fontFamily: 'Inter',
+      fontSize: _responsiveFontSize(
+        context,
+        heightFactor: 0.017,
+        minSize: 10.0,
+        maxSize: 12.0,
+      ),
+      fontWeight: FontWeight.w700,
+      color: AppColors.primary,
+    );
+  }
+
+  // Section title text style
+  static TextStyle sectionTitle(BuildContext context) {
+    return TextStyle(
+      fontFamily: 'Inter',
+      fontSize: _responsiveFontSize(
+        context,
+        heightFactor: 0.022,
+        minSize: 16.0,
+        maxSize: 18.0,
+      ),
+      fontWeight: FontWeight.w600,
+      color: AppColors.textPrimary,
+    );
+  }
+
+  // See all button text style
+  static TextStyle seeAll(BuildContext context) {
+    return TextStyle(
+      fontFamily: 'Inter',
+      fontSize: _responsiveFontSize(
+        context,
+        heightFactor: 0.017,
+        minSize: 12.0,
+        maxSize: 14.0,
+      ),
+      fontWeight: FontWeight.w500,
+      color: AppColors.primary,
+    );
+  }
+
+  // Suggested profile name style
+  static TextStyle suggestedProfileName(BuildContext context) {
+    return TextStyle(
+      fontFamily: 'Inter',
+      fontSize: _responsiveFontSize(
+        context,
+        heightFactor: 0.019,
+        minSize: 14.0,
+        maxSize: 16.0,
+      ),
+      fontWeight: FontWeight.w600,
+      color: AppColors.textPrimary,
+    );
+  }
+
+  // Suggested profile match percentage
+  static TextStyle suggestedMatchPercentage(BuildContext context) {
+    return TextStyle(
+      fontFamily: 'Inter',
+      fontSize: _responsiveFontSize(
+        context,
+        heightFactor: 0.013,
+        minSize: 10.0,
+        maxSize: 11.0,
+      ),
+      fontWeight: FontWeight.w600,
+      color: AppColors.primary,
     );
   }
 }

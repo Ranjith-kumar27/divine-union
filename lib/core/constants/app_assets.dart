@@ -9,6 +9,13 @@ class AppAssets {
   static const String female = 'assets/icons/female.svg';
   static const String logo = 'assets/images/logo.png';
   static const String couple = 'assets/icons/couple.svg';
+  static const String settings = 'assets/icons/settings.svg';
+  static const String cancel = 'assets/icons/cancel.svg';
+  static const String like = 'assets/icons/like.svg';
+  static const String matches = 'assets/icons/matches.svg';
+  static const String chat = 'assets/icons/chat.svg';
+  static const String heart = 'assets/icons/heart.svg';
+  static const String profile = 'assets/icons/profile.svg';
 
   // Profile Type Screen Assets
   static const String personIcon = 'assets/images/person.png';

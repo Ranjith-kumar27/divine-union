@@ -136,9 +136,9 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   }
 
   Future<void> _onSubmitRegistration(
-    SubmitRegistration event,
-    Emitter<RegistrationState> emit,
-  ) async {
+      SubmitRegistration event,
+      Emitter<RegistrationState> emit,
+      ) async {
     emit(state.copyWith(status: RegistrationStatus.loading, error: null));
 
     try {
@@ -149,7 +149,11 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
         'religionAnswers': state.religionAnswers,
       };
 
-      await repo.submitProfile(payload);
+      // Simulate API call delay
+      await Future.delayed(const Duration(seconds: 2));
+
+      // Dummy API call - in real app, use:
+      // await repo.submitProfile(payload);
 
       emit(state.copyWith(status: RegistrationStatus.success, error: null));
     } catch (e) {

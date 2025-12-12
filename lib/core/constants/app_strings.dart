@@ -2,6 +2,17 @@
 class AppStrings {
   AppStrings._();
 
+  // Home Screen
+  static const String matchingProfiles = 'Matching profiles';
+  static const String findPerfectMatch = 'Find your perfect match';
+  static const String suggestedProfiles = 'Suggested Profiles';
+  static const String seeAll = 'See all';
+
+  // Match Card
+  static const String premium = 'Premium';
+  static const String christian = 'Christian';
+  static const String kapuChristians = 'Kapu Christians';
+
   // Mobile Number Screen
   static const String journeyStartsHere = 'The journey of your heart starts here.';
   static const String yourMobileNumber = 'Your mobile number';
@@ -24,6 +35,12 @@ class AppStrings {
   static const String forFamily = 'For family';
   static const String forFamilySubtitle = 'Built together as a family';
   static const String next = 'Next';
+
+  // Bottom Navigation
+  static const String matches = 'Matches';
+  static const String chat = 'Chat';
+  static const String likes = 'Likes';
+  static const String profile = 'Profile';
 
   // Common
   static const String error = 'Error';

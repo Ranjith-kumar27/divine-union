@@ -2,11 +2,22 @@
 class Assets {
   Assets._();
 
+  static const String fontsInterBold = 'assets/fonts/Inter-Bold.ttf';
+  static const String fontsInterMedium = 'assets/fonts/Inter-Medium.ttf';
+  static const String fontsInterRegular = 'assets/fonts/Inter-Regular.ttf';
+  static const String fontsInterSemiBold = 'assets/fonts/Inter-SemiBold.ttf';
   static const String fontsLoraBold = 'assets/fonts/Lora-Bold.ttf';
   static const String fontsLoraMedium = 'assets/fonts/Lora-Medium.ttf';
   static const String fontsLoraRegular = 'assets/fonts/Lora-Regular.ttf';
   static const String fontsLoraSemiBold = 'assets/fonts/Lora-SemiBold.ttf';
+  static const String iconsArrowDown = 'assets/icons/arrow-down.svg';
+  static const String iconsArrowRight = 'assets/icons/arrow-right.svg';
+  static const String iconsCouple = 'assets/icons/couple.svg';
+  static const String iconsFemale = 'assets/icons/female.svg';
+  static const String iconsMale = 'assets/icons/male.svg';
   static const String iconsPerson = 'assets/icons/person.svg';
+  static const String imagesForFamilyIcon = 'assets/images/ForFamilyIcon.png';
+  static const String imagesForMeIcon = 'assets/images/ForMeIcon.png';
   static const String imagesGitBanner = 'assets/images/git_banner.png';
   static const String imagesPerson = 'assets/images/person.png';
 
