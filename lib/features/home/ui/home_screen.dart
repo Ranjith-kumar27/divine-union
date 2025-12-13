@@ -23,70 +23,70 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Map<String, dynamic>> _profiles = [
     {
       "image":
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2",
+      "https://i.pinimg.com/736x/3e/86/1c/3e861cace82afdabcfbd7d5d354edda4.jpg",
       "name": "Sarah Williams",
       "age": 24,
       "match": 96,
     },
     {
       "image":
-      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
+      "https://i.pinimg.com/1200x/e8/5e/10/e85e1004513e5d550e4094ed6640ae88.jpg",
       "name": "Emily Johnson",
       "age": 26,
       "match": 94,
     },
     {
       "image":
-      "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91",
+      "https://i.pinimg.com/1200x/29/65/b9/2965b94b6b98dcc95e306f9665c71713.jpg",
       "name": "Olivia Brown",
       "age": 25,
       "match": 92,
     },
     {
       "image":
-      "https://images.unsplash.com/photo-1517841905240-472988babdf9",
+      "https://i.pinimg.com/1200x/24/0b/29/240b2912880da864e767dddbefb9f4be.jpg",
       "name": "Sophia Martinez",
       "age": 23,
       "match": 97,
     },
     {
       "image":
-      "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7",
+      "https://i.pinimg.com/736x/96/6c/11/966c11c2de865314f078cc34becd2670.jpg",
       "name": "Isabella Garcia",
       "age": 27,
       "match": 91,
     },
     {
       "image":
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+      "https://i.pinimg.com/1200x/96/0e/6c/960e6cc2da83705a8e1ea685527290b3.jpg",
       "name": "Ava Thompson",
       "age": 24,
       "match": 95,
     },
     {
       "image":
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+      "https://i.pinimg.com/736x/70/70/1a/70701a672ecdd1bbaa8400a04977e718.jpg",
       "name": "Mia Anderson",
       "age": 22,
       "match": 93,
     },
     {
       "image":
-      "https://images.unsplash.com/photo-1548142813-c348350df52b",
+      "https://i.pinimg.com/736x/2e/63/21/2e632194a21a7fc18e2ada8f276531e5.jpg",
       "name": "Charlotte Lee",
       "age": 28,
       "match": 90,
     },
     {
       "image":
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+      "https://i.pinimg.com/originals/7e/61/37/7e613711bbcc148dde2ff971b969ba9d.png",
       "name": "Amelia Wilson",
       "age": 26,
       "match": 94,
     },
     {
       "image":
-      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f",
+      "https://i.pinimg.com/1200x/b6/62/de/b662deb210fbc898489ac2031a3abdf7.jpg",
       "name": "Harper Collins",
       "age": 25,
       "match": 96,
