@@ -16,6 +16,9 @@ class AppAssets {
   static const String chat = 'assets/icons/chat.svg';
   static const String heart = 'assets/icons/heart.svg';
   static const String profile = 'assets/icons/profile.svg';
+  static const chatEmpty = 'assets/icons/chat-empty.svg';
+  static const heartEmpty = 'assets/icons/heart-empty.svg';
+  static const whiteHeart = 'assets/icons/white-heart.svg';
 
   // Profile Type Screen Assets
   static const String personIcon = 'assets/images/person.png';

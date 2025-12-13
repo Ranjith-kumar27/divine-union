@@ -42,6 +42,21 @@ class AppStrings {
   static const String likes = 'Likes';
   static const String profile = 'Profile';
 
+  // Chat Screen
+  static const noMessagesYet = 'No Messages Yet';
+  static const startMeaningfulConversations = 'Start meaningful conversations with your matches.';
+  static const journeyBeginsHere = 'Your journey to finding a life partner begins here.';
+  static const exploreMatches = 'Explore Matches';
+
+  // Likes Screen
+  static const perfectMatchAroundCorner = 'Your perfect match is just around the corner';
+  static const likesYou = 'Likes you';
+  static const likedByYou = 'Liked by you';
+  static const mutual = 'Mutual';
+  static const noLikesYet = 'No Likes Yet';
+  static const whenSomeoneLikesYou = 'When someone likes your profile, they\'ll appear here.';
+  static const keepProfileUpdated = 'Keep your profile updated!';
+
   // Common
   static const String error = 'Error';
   static const String success = 'Success';

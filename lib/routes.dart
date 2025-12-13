@@ -1,3 +1,4 @@
+import 'package:divineunion_matrimony/features/main_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'features/home/ui/home_screen.dart';
@@ -20,6 +21,7 @@ class Routes {
   static const religion = '/religion';
   static const registrationSuccess = '/registration-success';
   static const home = '/home';
+  static const main = '/main';
 }
 
 class AppRouter {
@@ -48,6 +50,10 @@ class AppRouter {
       case Routes.home:
         return MaterialPageRoute(
           builder: (_) => const HomeScreen(),
+        );
+      case Routes.main:
+        return MaterialPageRoute(
+          builder: (_) => const MainScreen(),
         );
       default:
         return MaterialPageRoute(
