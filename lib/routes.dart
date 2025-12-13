@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'features/registration/ui/home_screen.dart';
+import 'features/home/ui/home_screen.dart';
 import 'features/registration/ui/mobile_number_screen.dart';
 import 'features/registration/ui/otp_screen.dart';
 import 'features/registration/ui/perfect_match_screen.dart';
