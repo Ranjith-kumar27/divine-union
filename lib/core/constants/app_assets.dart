@@ -19,6 +19,8 @@ class AppAssets {
   static const chatEmpty = 'assets/icons/chat-empty.svg';
   static const heartEmpty = 'assets/icons/heart-empty.svg';
   static const whiteHeart = 'assets/icons/white-heart.svg';
+  static const mutualEmpty = 'assets/icons/mutual-card.svg';
+  static const heartCard = 'assets/icons/heart-card.svg';
 
   // Profile Type Screen Assets
   static const String personIcon = 'assets/images/person.png';

@@ -49,7 +49,7 @@ class AppStrings {
   static const exploreMatches = 'Explore Matches';
 
   // Likes Screen
-  static const perfectMatchAroundCorner = 'Your perfect match is just around the corner';
+  static const perfectMatchAroundCorner = 'Your perfect match is just around the corner✨';
   static const likesYou = 'Likes you';
   static const likedByYou = 'Liked by you';
   static const mutual = 'Mutual';
