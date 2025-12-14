@@ -47,6 +47,7 @@ class AppStrings {
   static const startMeaningfulConversations = 'Start meaningful conversations with your matches.';
   static const journeyBeginsHere = 'Your journey to finding a life partner begins here.';
   static const exploreMatches = 'Explore Matches';
+  static const String messages = 'Messages';
 
   // Likes Screen
   static const perfectMatchAroundCorner = 'Your perfect match is just around the corner✨';

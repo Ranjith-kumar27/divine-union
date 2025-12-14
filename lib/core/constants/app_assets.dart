@@ -25,6 +25,10 @@ class AppAssets {
   static const education = 'assets/icons/education.svg';
   static const location = 'assets/icons/location.svg';
   static const pass = 'assets/icons/pass.svg';
+  static const info = 'assets/icons/info.svg';
+  static const back = 'assets/icons/back.svg';
+  static const search = 'assets/icons/search.svg';
+  static const emoji = 'assets/icons/emoji.svg';
 
 
   // Profile Type Screen Assets
