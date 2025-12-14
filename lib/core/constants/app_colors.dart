@@ -17,6 +17,8 @@ class AppColors {
   // Secondary text (labels, hints)
   static const Color textSecondary = Color(0xFF8A8A8F);
 
+  static const Color textTertiary = Color(0xFF3B3B4D);
+
   // Backgrounds
   static const Color scaffoldBackground = Color(0xFFFFFFFF);
   static const Color fieldBackground = Color(0xFFFFFFFF);

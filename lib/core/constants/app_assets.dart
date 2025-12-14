@@ -21,6 +21,11 @@ class AppAssets {
   static const whiteHeart = 'assets/icons/white-heart.svg';
   static const mutualEmpty = 'assets/icons/mutual-card.svg';
   static const heartCard = 'assets/icons/heart-card.svg';
+  static const job = 'assets/icons/job.svg';
+  static const education = 'assets/icons/education.svg';
+  static const location = 'assets/icons/location.svg';
+  static const pass = 'assets/icons/pass.svg';
+
 
   // Profile Type Screen Assets
   static const String personIcon = 'assets/images/person.png';

@@ -17,8 +17,48 @@ class LikesScreen extends StatefulWidget {
 class _LikesScreenState extends State<LikesScreen> {
   int _selectedIndex = 0;
 
+  /// ---------------- DUMMY DATA (API READY) ----------------
+  final List<Map<String, dynamic>> _likesYouProfiles = [
+    {
+      "image":
+          "https://i.pinimg.com/1200x/e8/5e/10/e85e1004513e5d550e4094ed6640ae88.jpg",
+      "name": "Emily Johnson",
+      "age": 26,
+      "match": 94,
+      "height": "5'10",
+      "job": "UI/UX Designer",
+      "education": "M.Des",
+      "location": "Mumbai, Maharashtra",
+    },
+    {
+      "image":
+          "https://i.pinimg.com/1200x/b6/62/de/b662deb210fbc898489ac2031a3abdf7.jpg",
+      "name": "Olivia Brown",
+      "age": 25,
+      "match": 92,
+      "height": "5'10",
+      "job": "Product Analyst",
+      "education": "MBA",
+      "location": "Pune, Maharashtra",
+    },
+    {
+      "image":
+          "https://i.pinimg.com/originals/7e/61/37/7e613711bbcc148dde2ff971b969ba9d.png",
+      "name": "Sarah Williams",
+      "age": 24,
+      "match": 96,
+      "height": "5'10",
+      "job": "Software Engineer",
+      "education": "B.Tech in Computer Science",
+      "location": "Bangalore, Karnataka",
+    },
+  ];
+
+  final List<Map<String, dynamic>> _likedByYouProfiles = [];
+  final List<Map<String, dynamic>> _mutualProfiles = [];
+
   final List<Map<String, dynamic>> _tabs = [
-    {"label": "Likes you", "count": 0},
+    {"label": "Likes you", "count": 1},
     {"label": "Liked by you", "count": 0},
     {"label": "Mutual", "count": 0},
   ];
@@ -33,7 +73,7 @@ class _LikesScreenState extends State<LikesScreen> {
           children: [
             const SizedBox(height: AppSizes.mediumSpacing),
 
-            /// Title
+            /// TITLE
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSizes.horizontalPadding,
@@ -45,7 +85,7 @@ class _LikesScreenState extends State<LikesScreen> {
               ),
             ),
 
-            /// Subtitle
+            /// SUBTITLE
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSizes.horizontalPadding,
@@ -60,7 +100,7 @@ class _LikesScreenState extends State<LikesScreen> {
 
             const SizedBox(height: 20),
 
-            /// Tabs
+            /// TABS
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSizes.mediumSpacing,
@@ -69,7 +109,7 @@ class _LikesScreenState extends State<LikesScreen> {
                 children: List.generate(
                   _tabs.length,
                   (index) => Padding(
-                    padding: const EdgeInsets.only(right: 10),
+                    padding: const EdgeInsets.only(right: 10, bottom: 10),
                     child: _buildTab(
                       index: index,
                       label: _tabs[index]["label"],
@@ -80,7 +120,7 @@ class _LikesScreenState extends State<LikesScreen> {
               ),
             ),
 
-            /// Content
+            /// CONTENT
             Expanded(child: _buildTabContent()),
           ],
         ),
@@ -88,20 +128,315 @@ class _LikesScreenState extends State<LikesScreen> {
     );
   }
 
-  /// ---------------- TAB CONTENT ----------------
+  /// ---------------- TAB CONTENT SWITCH ----------------
 
   Widget _buildTabContent() {
     switch (_selectedIndex) {
       case 1:
-        return _likedByYouEmpty();
+        return _likedByYouProfiles.isNotEmpty
+            ? _likedByYouList()
+            : _likedByYouEmpty();
       case 2:
-        return _mutualEmpty();
+        return _mutualProfiles.isNotEmpty ? _mutualList() : _mutualEmpty();
       default:
-        return _likesYouEmpty();
+        return _likesYouProfiles.isNotEmpty
+            ? _likesYouList()
+            : _likesYouEmpty();
     }
   }
 
-  /// Likes You (EMPTY)
+  /// ---------------- LIKES YOU LIST ----------------
+
+  Widget _likesYouList() {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+      itemCount: _likesYouProfiles.length,
+      itemBuilder: (context, index) {
+        final profile = _likesYouProfiles[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: _profileCard(profile),
+        );
+      },
+    );
+  }
+
+  /// ---------------- LIKED BY YOU LIST ----------------
+
+  Widget _likedByYouList() {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      itemCount: _likedByYouProfiles.length,
+      itemBuilder: (context, index) {
+        final profile = _likedByYouProfiles[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: _profileCard(profile),
+        );
+      },
+    );
+  }
+
+  /// ---------------- MUTUAL LIST ----------------
+
+  Widget _mutualList() {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      itemCount: _mutualProfiles.length,
+      itemBuilder: (context, index) {
+        final profile = _mutualProfiles[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: _profileCard(profile),
+        );
+      },
+    );
+  }
+
+  /// ---------------- PROFILE CARD ----------------
+
+  Widget _profileCard(Map<String, dynamic> profile) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border, width: 1.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// IMAGE
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            child: Stack(
+              children: [
+                Image.network(
+                  profile["image"],
+                  height: 320,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  alignment: const Alignment(0, -0.8),
+                ),
+
+                /// MATCH %
+                Positioned(
+                  top: 12,
+                  left: 12,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset(
+                          AppAssets.whiteHeart,
+                          width: 14,
+                          height: 14,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          "${profile["match"]}%",
+                          style: AppTextStyles.body(context).copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                /// VERIFIED
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: _pill("Verified", Colors.blue),
+                ),
+              ],
+            ),
+          ),
+
+          /// DETAILS
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "${profile["name"]}, ${profile["age"]}",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Lora',
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  "${profile["height"]}''",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Inter',
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    SvgPicture.asset(AppAssets.job),
+                    const SizedBox(width: 6),
+                    Text(
+                      profile["job"],
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Inter',
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    SvgPicture.asset(AppAssets.education),
+                    const SizedBox(width: 6),
+                    Text(
+                      profile["education"],
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Inter',
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    SvgPicture.asset(AppAssets.location),
+                    const SizedBox(width: 6),
+                    Text(
+                      profile["location"],
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Inter',
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 14),
+
+                /// ACTIONS
+                Row(
+                  children: [
+                    /// PASS
+                    Expanded(
+                      child: SizedBox(
+                        height: 52,
+                        child: OutlinedButton.icon(
+                          onPressed: () {},
+                          icon: SvgPicture.asset(
+                            AppAssets.pass,
+                            width: 18,
+                            height: 18,
+                          ),
+                          label: const Text("Pass"),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: AppColors.liteDisabled,
+                            foregroundColor: AppColors.textTertiary,
+                            side: BorderSide.none,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            textStyle: AppTextStyles.body(
+                              context,
+                            ).copyWith(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    /// ACCEPT
+                    Expanded(
+                      child: SizedBox(
+                        height: 52,
+                        child: ElevatedButton.icon(
+                          onPressed: () {},
+                          icon: SvgPicture.asset(
+                            AppAssets.heart,
+                            width: 18,
+                            height: 18,
+                            color: Colors.white,
+                          ),
+                          label: const Text("Accept"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            textStyle: AppTextStyles.body(
+                              context,
+                            ).copyWith(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ---------------- HELPERS ----------------
+
+  Widget _pill(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  /// ---------------- EMPTY STATES (UNCHANGED) ----------------
+
   Widget _likesYouEmpty() {
     return _centerContent(
       icon: AppAssets.heartEmpty,
@@ -111,19 +446,16 @@ class _LikesScreenState extends State<LikesScreen> {
     );
   }
 
-  /// Liked By You (EMPTY)
   Widget _likedByYouEmpty() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _circleIcon(AppAssets.heartCard),
-
+        const SizedBox(height: 16),
         Text(
           "Start Exploring",
           style: AppTextStyles.heading(context).copyWith(fontSize: 20),
         ),
-
-        // const SizedBox(height: 8),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
@@ -134,44 +466,42 @@ class _LikesScreenState extends State<LikesScreen> {
             ).copyWith(color: Colors.grey[600]),
           ),
         ),
-
-        const SizedBox(height: 4),
-
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Container(
-            width: double.infinity,
-            height: 52,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.primary, AppColors.primary.withOpacity(0.8)],
-              ),
-              borderRadius: BorderRadius.circular(8),
+        const SizedBox(height: 12),
+        Container(
+          width: 250,
+          height: 52,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppColors.primary, AppColors.primary.withOpacity(0.8)],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
             ),
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(26),
-                ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(26),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SvgPicture.asset(AppAssets.whiteHeart),
-                  const SizedBox(width: 10),
-                  Text(
-                    AppStrings.exploreMatches,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SvgPicture.asset(AppAssets.whiteHeart),
+                const SizedBox(width: 10),
+                Text(
+                  AppStrings.exploreMatches,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -179,7 +509,6 @@ class _LikesScreenState extends State<LikesScreen> {
     );
   }
 
-  /// Mutual (EMPTY)
   Widget _mutualEmpty() {
     return _centerContent(
       icon: AppAssets.mutualEmpty,
@@ -189,7 +518,7 @@ class _LikesScreenState extends State<LikesScreen> {
     );
   }
 
-  /// ---------------- COMMON WIDGETS ----------------
+  /// ---------------- COMMON ----------------
 
   Widget _centerContent({
     required String icon,
@@ -254,8 +583,6 @@ class _LikesScreenState extends State<LikesScreen> {
               ),
             ),
             const SizedBox(width: 6),
-
-            /// Count Circle
             Container(
               width: 22,
               height: 22,
@@ -283,12 +610,23 @@ class _LikesScreenState extends State<LikesScreen> {
 
   String get _subtitleText {
     switch (_selectedIndex) {
-      case 1:
-        return "Start connecting with people you like💫";
-      case 2:
-        return "Find your special someone today💜";
+      case 0: // Likes You
+        return _likesYouProfiles.isNotEmpty
+            ? "Someone's got their eyes on you. ✨"
+            : "Your perfect match is just around the corner ✨";
+
+      case 1: // Liked by You
+        return _likedByYouProfiles.isNotEmpty
+            ? "You made the first move. 💫"
+            : "Start connecting with people you like 💫";
+
+      case 2: // Mutual
+        return _mutualProfiles.isNotEmpty
+            ? "Find your special someone today 💜"
+            : "Find your special someone today 💜";
+
       default:
-        return "Your perfect match is just around the corner✨";
+        return "";
     }
   }
 }
