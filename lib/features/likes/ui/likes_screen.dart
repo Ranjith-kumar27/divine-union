@@ -32,17 +32,6 @@ class _LikesScreenState extends State<LikesScreen> {
     },
     {
       "image":
-          "https://i.pinimg.com/1200x/b6/62/de/b662deb210fbc898489ac2031a3abdf7.jpg",
-      "name": "Olivia Brown",
-      "age": 25,
-      "match": 92,
-      "height": "5'10",
-      "job": "Product Analyst",
-      "education": "MBA",
-      "location": "Pune, Maharashtra",
-    },
-    {
-      "image":
           "https://i.pinimg.com/originals/7e/61/37/7e613711bbcc148dde2ff971b969ba9d.png",
       "name": "Sarah Williams",
       "age": 24,
@@ -54,13 +43,55 @@ class _LikesScreenState extends State<LikesScreen> {
     },
   ];
 
-  final List<Map<String, dynamic>> _likedByYouProfiles = [];
+  final List<Map<String, dynamic>> _likedByYouProfiles = [
+    {
+      "image":
+      "https://i.pinimg.com/1200x/e8/5e/10/e85e1004513e5d550e4094ed6640ae88.jpg",
+      "name": "Rebecca Antony",
+      "age": 25,
+      "match": 95,
+      "location": "Chennai",
+    },
+    {
+      "image":
+      "https://i.pinimg.com/1200x/b6/62/de/b662deb210fbc898489ac2031a3abdf7.jpg",
+      "name": "Rachel Mary",
+      "age": 24,
+      "match": 92,
+      "location": "Chennai",
+    },
+    {
+      "image":
+      "https://i.pinimg.com/1200x/29/65/b9/2965b94b6b98dcc95e306f9665c71713.jpg",
+      "name": "Olivia Brown",
+      "age": 23,
+      "match": 75,
+      "location": "Chennai",
+    },
+    {
+      "image":
+      "https://i.pinimg.com/736x/96/6c/11/966c11c2de865314f078cc34becd2670.jpg",
+      "name": "Reni",
+      "age": 24,
+      "match": 85,
+      "location": "Chennai",
+    },
+    {
+      "image":
+      "https://i.pinimg.com/1200x/96/0e/6c/960e6cc2da83705a8e1ea685527290b3.jpg",
+      "name": "Rachel Mary",
+      "age": 24,
+      "match": 92,
+      "location": "Chennai",
+    },
+  ];
+
   final List<Map<String, dynamic>> _mutualProfiles = [];
 
-  final List<Map<String, dynamic>> _tabs = [
-    {"label": "Likes you", "count": 1},
-    {"label": "Liked by you", "count": 0},
-    {"label": "Mutual", "count": 0},
+  late final List<Map<String, dynamic>> _tabs = [
+    {"label": "Likes you", "count": _likesYouProfiles.length},
+    {"label": "Liked by you", "count": _likedByYouProfiles.length},
+    {"label": "Mutual", "count": _mutualProfiles.length},
   ];
 
   @override
@@ -164,15 +195,18 @@ class _LikesScreenState extends State<LikesScreen> {
   /// ---------------- LIKED BY YOU LIST ----------------
 
   Widget _likedByYouList() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+    return GridView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.68, // matches image card ratio
+      ),
       itemCount: _likedByYouProfiles.length,
       itemBuilder: (context, index) {
         final profile = _likedByYouProfiles[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: _profileCard(profile),
-        );
+        return _likedByYouCard(profile);
       },
     );
   }
@@ -180,20 +214,23 @@ class _LikesScreenState extends State<LikesScreen> {
   /// ---------------- MUTUAL LIST ----------------
 
   Widget _mutualList() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+    return GridView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.68, // matches image card ratio
+      ),
       itemCount: _mutualProfiles.length,
       itemBuilder: (context, index) {
         final profile = _mutualProfiles[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: _profileCard(profile),
-        );
+        return _mutualCard(profile);
       },
     );
   }
 
-  /// ---------------- PROFILE CARD ----------------
+  /// ----------------LIKES YOU - PROFILE CARD ----------------
 
   Widget _profileCard(Map<String, dynamic> profile) {
     return Container(
@@ -431,6 +468,196 @@ class _LikesScreenState extends State<LikesScreen> {
           fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
+      ),
+    );
+  }
+
+  /// ---------------- LIKED BY YOUR CARD ----------------
+
+  Widget _likedByYouCard(Map<String, dynamic> profile) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        image: DecorationImage(
+          image: NetworkImage(profile["image"]),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Stack(
+        children: [
+          /// Gradient overlay
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.55),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          /// MATCH %
+          Positioned(
+            top: 10,
+            left: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    AppAssets.whiteHeart,
+                    width: 12,
+                    height: 12,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    "${profile["match"]}%",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          /// DETAILS
+          Positioned(
+            left: 12,
+            right: 12,
+            bottom: 12,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  profile["name"],
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  "${profile["location"]} · ${profile["age"]}",
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ---------------- MUTUAL CARD ----------------
+
+  Widget _mutualCard(Map<String, dynamic> profile) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        image: DecorationImage(
+          image: NetworkImage(profile["image"]),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Stack(
+        children: [
+          /// Gradient overlay
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.55),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          /// MATCH %
+          Positioned(
+            top: 10,
+            left: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    AppAssets.whiteHeart,
+                    width: 12,
+                    height: 12,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    "${profile["match"]}%",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          /// DETAILS
+          Positioned(
+            left: 12,
+            right: 12,
+            bottom: 12,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  profile["name"],
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  "${profile["location"]} · ${profile["age"]}",
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
