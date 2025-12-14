@@ -33,11 +33,16 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
   late Timer _timer;
   String? _appSignature;
   bool _isResending = false;
+  bool _isAutoFilled = false; // Track if OTP has been auto-filled
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     mobile = ModalRoute.of(context)?.settings.arguments as String? ?? '';
+
+    // Listen for OTP code from BLoC state
+    final state = BlocProvider.of<RegistrationBloc>(context).state;
+    _autoFillOtpFromState(state);
   }
 
   @override
@@ -55,6 +60,29 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
       }
     }
     _updateVerificationState();
+  }
+
+  // New method to auto-fill OTP from BLoC state
+  void _autoFillOtpFromState(RegistrationState state) {
+    if (state.otpCode != null &&
+        state.otpCode!.length == 6 &&
+        !_isAutoFilled &&
+        _otpControllers.length == 6) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          final otpCode = state.otpCode!;
+          for (int i = 0; i < 6; i++) {
+            if (i < otpCode.length) {
+              _otpControllers[i].text = otpCode[i];
+            }
+          }
+          setState(() {
+            _canVerify = true;
+            _isAutoFilled = true;
+          });
+        }
+      });
+    }
   }
 
   @override
@@ -131,7 +159,14 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
     if (_remainingSeconds == 0 && !_isResending) {
       setState(() {
         _isResending = true;
+        _isAutoFilled = false; // Reset auto-fill flag when resending
       });
+
+      // Clear OTP fields when resending
+      for (var controller in _otpControllers) {
+        controller.clear();
+      }
+      _updateVerificationState();
 
       // Get the bloc
       final bloc = BlocProvider.of<RegistrationBloc>(context);
@@ -181,6 +216,9 @@ class _OTPScreenState extends State<OTPScreen> with CodeAutoFill {
 
     return BlocListener<RegistrationBloc, RegistrationState>(
       listener: (context, state) {
+        // Auto-fill OTP when it's available in state (after sending or resending)
+        _autoFillOtpFromState(state);
+
         if (state.status == RegistrationStatus.verified) {
           // Navigate to profile type screen on successful verification
           Navigator.of(context).pushReplacementNamed(Routes.profileType);
