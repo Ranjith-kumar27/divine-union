@@ -15,7 +15,7 @@ class _RegistrationSuccessScreenState extends State<RegistrationSuccessScreen> {
     // Navigate to home screen after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.of(context).pushNamedAndRemoveUntil(
-        Routes.home, // We'll add this route
+        Routes.main, // We'll add this route
             (route) => false,
       );
     });

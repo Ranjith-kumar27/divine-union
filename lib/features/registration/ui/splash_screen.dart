@@ -31,12 +31,12 @@ class _SplashScreenState extends State<SplashScreen> {
     if (isVerified) {
       // User is verified, go to profile type with clearing stack
       Navigator.of(context).pushNamedAndRemoveUntil(
-        Routes.profileType,
+        Routes.main,
         (route) => false, // Clear all routes
       );
     } else {
       // User not verified, go to mobile number screen
-      Navigator.of(context).pushReplacementNamed(Routes.perfectMatch);
+      Navigator.of(context).pushReplacementNamed(Routes.mobileNumber);
     }
   }
 
