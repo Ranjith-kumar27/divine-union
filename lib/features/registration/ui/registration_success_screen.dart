@@ -1,3 +1,4 @@
+import 'package:divineunion_matrimony/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../../../routes.dart';
 
@@ -36,12 +37,12 @@ class _RegistrationSuccessScreenState extends State<RegistrationSuccessScreen> {
                 height: 120,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.green.withOpacity(0.1),
+                  color: AppColors.primary.withOpacity(0.1),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check_rounded,
                   size: 60,
-                  color: Colors.green,
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(height: 32),
