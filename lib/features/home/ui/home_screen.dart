@@ -6,6 +6,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
+import 'widgets/filter_bottom_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +17,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // Dummy data
+  int _activeFilters = 0;
+
   final Map<String, dynamic> _profileData = {
     "image":
         "https://i.pinimg.com/736x/3e/86/1c/3e861cace82afdabcfbd7d5d354edda4.jpg",
@@ -315,14 +318,58 @@ class _HomeScreenState extends State<HomeScreen> {
             height: AppSizes.iconButtonSize,
             child: IconButton(
               padding: EdgeInsets.zero,
-              onPressed: () {},
-              icon: SvgPicture.asset(
-                AppAssets.settings,
-                width: AppSizes.iconSizeMedium,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.textPrimary,
-                  BlendMode.srcIn,
-                ),
+              onPressed: () async {
+                final result = await showModalBottomSheet<int>(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const FilterBottomSheet(),
+                );
+
+                if (result != null) {
+                  setState(() {
+                    _activeFilters = result;
+                  });
+                }
+              },
+              icon: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  SvgPicture.asset(
+                    AppAssets.settings,
+                    width: AppSizes.iconSizeMedium,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.textPrimary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  if (_activeFilters > 0)
+                    Positioned(
+                      right: -4,
+                      top: -8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$_activeFilters',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
