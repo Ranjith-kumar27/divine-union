@@ -30,10 +30,10 @@ class AppAssets {
   static const search = 'assets/icons/search.svg';
   static const emoji = 'assets/icons/emoji.svg';
 
-
   // Profile Type Screen Assets
   static const String personIcon = 'assets/images/person.png';
   static const String forMeIcon = 'assets/images/ForMeIcon.png';
   static const String forFamilyIcon = 'assets/images/ForFamilyIcon.png';
   static const String familyIcon = 'assets/images/family.png';
+  static const String verified = 'assets/icons/verified.svg';
 }
