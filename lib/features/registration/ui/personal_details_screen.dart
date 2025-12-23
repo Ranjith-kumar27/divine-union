@@ -32,6 +32,21 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   String? _selectedMotherTongue;
   List<String> _selectedLanguages = [];
 
+  // Add height unit state
+  String _selectedHeightUnit = 'ft'; // Default unit
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_updateState);
+    _dobController.addListener(_updateState);
+    _heightController.addListener(_updateState);
+  }
+
+  void _updateState() {
+    if (mounted) setState(() {});
+  }
+
   final List<String> _genderOptions = ['Male', 'Female'];
   final List<String> _maritalOptions = [
     'Single',
@@ -114,6 +129,9 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
     'Other',
   ];
 
+  // Add height units
+  final List<String> _heightUnits = ['ft', 'cm'];
+
   bool get _isFormValid {
     return _nameController.text.isNotEmpty &&
         _dobController.text.isNotEmpty &&
@@ -129,6 +147,28 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   bool _isValidHeight(String heightText) {
     final height = double.tryParse(heightText);
     return height != null && height > 0;
+  }
+
+  // Add method to show height unit bottom sheet
+  void _showHeightUnitBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: AppColors.disabled.withOpacity(0.5),
+      builder: (context) => CustomBottomSheet.locationSelection(
+        title: 'Select Height Unit',
+        options: _heightUnits,
+        selectedValue: _selectedHeightUnit,
+        onSelect: (selected) {
+          setState(() {
+            _selectedHeightUnit = selected;
+          });
+        },
+        heightFactor: 0.32,
+        showSearch: false,
+      ),
+    );
   }
 
   void _showDatePickerBottomSheet() {
@@ -315,9 +355,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
       builder: (context) => CustomBottomSheet.motherTongue(
         options: _motherTongueOptions,
         selectedValue: _selectedMotherTongue,
-        // Changed from selectedValues to selectedValue
         onSelect: (selected) {
-          // Changed from onSelect to accept String instead of List<String>
           setState(() {
             _selectedMotherTongue = selected;
           });
@@ -368,6 +406,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
       'name': _nameController.text.trim(),
       'dob': _dobController.text.trim(),
       'height': _heightController.text.trim(),
+      'heightUnit': _selectedHeightUnit, // Add height unit to details
       'gender': _selectedGender,
       'maritalStatus': _selectedMaritalStatus,
       'location': _selectedLocation,
@@ -406,6 +445,8 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
     VoidCallback? onTap,
     bool readOnly = false,
   }) {
+    final bool hasValue = controller.text.isNotEmpty;
+
     return Container(
       height: AppSizes.fieldHeight,
       decoration: BoxDecoration(
@@ -436,7 +477,9 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                   fontFamily: 'Inter',
                   fontSize: 16.0,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: hasValue
+                      ? AppColors.textPrimary
+                      : AppColors.textSecondary,
                 ),
               ),
             ),
@@ -490,7 +533,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       fontWeight: FontWeight.w600,
                       color: value != null
                           ? AppColors.textPrimary
-                          : AppColors.textSecondary.withOpacity(0.5),
+                          : AppColors.textSecondary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -566,9 +609,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
-                color: isSelected
-                    ? AppColors.textPrimary
-                    : AppColors.textSecondary,
+                color: isSelected ? AppColors.primary : AppColors.textSecondary,
               ),
             ),
           ],
@@ -584,29 +625,45 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
         _buildSectionTitle('Height'),
         Row(
           children: [
-            Container(
-              height: AppSizes.fieldHeight,
-              width: 60,
-              decoration: BoxDecoration(
-                color: AppColors.fieldBackground,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(AppSizes.fieldRadius),
-                  bottomLeft: Radius.circular(AppSizes.fieldRadius),
+            // Height unit selector button
+            GestureDetector(
+              onTap: _showHeightUnitBottomSheet,
+              child: Container(
+                height: AppSizes.fieldHeight,
+                width: 60,
+                decoration: BoxDecoration(
+                  color: AppColors.fieldBackground,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(AppSizes.fieldRadius),
+                    bottomLeft: Radius.circular(AppSizes.fieldRadius),
+                  ),
+                  border: Border.all(color: AppColors.border),
                 ),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Center(
-                child: Text(
-                  'ft',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _selectedHeightUnit.toUpperCase(),
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_drop_down,
+                        color: AppColors.textSecondary,
+                        size: 20,
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
+            // Height input field
             Expanded(
               child: Container(
                 height: AppSizes.fieldHeight,
@@ -630,23 +687,30 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       Expanded(
                         child: TextField(
                           controller: _heightController,
+                          onChanged: (val) {
+                            setState(() {});
+                          },
                           keyboardType: TextInputType.numberWithOptions(
                             decimal: true,
                           ),
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            hintText: '',
+                            hintText: _selectedHeightUnit == 'ft'
+                                ? '5.8'
+                                : '175',
                             hintStyle: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 16.0,
-                              color: AppColors.textSecondary,
+                              color: AppColors.textSecondary.withOpacity(0.5),
                             ),
                           ),
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontSize: 16.0,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: _heightController.text.isNotEmpty
+                                ? AppColors.textPrimary
+                                : AppColors.textSecondary,
                           ),
                         ),
                       ),
