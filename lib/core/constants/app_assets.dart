@@ -36,4 +36,15 @@ class AppAssets {
   static const String forFamilyIcon = 'assets/images/ForFamilyIcon.png';
   static const String familyIcon = 'assets/images/family.png';
   static const String verified = 'assets/icons/verified.svg';
+  static const String home = 'assets/icons/home.svg';
+  static const String calendar = 'assets/icons/calendar.svg';
+  static const String scale = 'assets/icons/scale.svg';
+  static const String spoon = 'assets/icons/spoon.svg';
+  static const String drink = 'assets/icons/drink.svg';
+  static const String smoke = 'assets/icons/smoke.svg';
+  static const String languages = 'assets/icons/languages.svg';
+  static const String personOutline = 'assets/icons/person-outline.svg';
+  static const String church = 'assets/icons/church.svg';
+  static const String star = 'assets/icons/star.svg';
+
 }

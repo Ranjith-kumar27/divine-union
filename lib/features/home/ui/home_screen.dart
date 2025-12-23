@@ -26,24 +26,24 @@ class _HomeScreenState extends State<HomeScreen> {
     "quote":
         "Numbers tell stories, but faith writes mine. Looking for a partner to share life's journey.",
     "basicDetails": [
-      {"icon": AppAssets.info, "label": "5'5\""},
-      {"icon": null, "label": "15-05-1997"},
+      {"icon": AppAssets.scale, "label": "5'5\""},
+      {"icon": AppAssets.calendar, "label": "15-05-1997"},
       {"icon": AppAssets.female, "label": "Female"},
     ],
     "sections": [
       {
         "title": "Faith & Church",
         "items": [
-          {"label": "Catholic", "icon": null}, // In UI this has a church icon
-          {"label": "Weekly", "icon": null},
-          {"label": "Strong & Serving", "icon": null},
+          {"label": "Catholic", "icon": AppAssets.church},
+          {"label": "Weekly", "icon": AppAssets.calendar},
+          {"label": "Strong & Serving", "icon": AppAssets.star},
         ],
       },
       {
         "title": "Involvement",
         "items": [
           {"label": "Active in Ministry", "icon": null},
-          {"label": "Bible Study", "icon": null},
+          {"label": "Bible Study", "icon": AppAssets.education},
         ],
       },
       {
@@ -71,16 +71,16 @@ class _HomeScreenState extends State<HomeScreen> {
       {
         "title": "Career Approach & Flexibility",
         "items": [
-          {"label": "Balanced", "icon": null},
-          {"label": "Open within India", "icon": null},
+          {"label": "Balanced", "icon": AppAssets.scale},
+          {"label": "Open within India", "icon": AppAssets.location},
         ],
       },
       {
         "title": "Lifestyle",
         "items": [
-          {"label": "Vegetarian", "icon": null},
-          {"label": "Non-Drinker", "icon": null},
-          {"label": "Non-Smoker", "icon": null},
+          {"label": "Vegetarian", "icon": AppAssets.spoon},
+          {"label": "Non-Drinker", "icon": AppAssets.drink},
+          {"label": "Non-Smoker", "icon": AppAssets.smoke},
         ],
       },
       {
@@ -88,23 +88,23 @@ class _HomeScreenState extends State<HomeScreen> {
         "items": [
           {"label": "Health Conscious", "icon": null},
           {"label": "Tradition Keeper", "icon": null},
-          {"label": "Introvert", "icon": null},
+          {"label": "Introvert", "icon": AppAssets.personOutline},
           {"label": "Learner", "icon": null},
         ],
       },
       {
         "title": "Languages",
         "items": [
-          {"label": "Tamil", "icon": null},
-          {"label": "English", "icon": null},
-          {"label": "Hindi", "icon": null},
+          {"label": "Tamil", "icon": AppAssets.languages},
+          {"label": "English", "icon": AppAssets.languages},
+          {"label": "Hindi", "icon": AppAssets.languages},
         ],
       },
       {
         "title": "Family Background",
         "items": [
-          {"label": "Nuclear Family", "icon": null},
-          {"label": "1 Brother (Married)", "icon": null},
+          {"label": "Nuclear Family", "icon": AppAssets.home},
+          {"label": "1 Brother (Married)", "icon": AppAssets.personOutline},
           {"label": "Family Essential", "icon": null},
           {"label": "Father: Retired Government Officer", "icon": null},
           {"label": "Mother: Homemaker", "icon": null},
@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "title": "Christ Centered Life",
         "items": [
           {"label": "Prayer & Worship", "icon": null},
-          {"label": "Faith-Filled Home", "icon": null},
+          {"label": "Faith-Filled Home", "icon": AppAssets.home},
           {"label": "Raise Christian Family", "icon": null},
         ],
       },
@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
           {"label": "Active in Church", "icon": null},
           {"label": "Kind & Mature", "icon": null},
           {"label": "Shared Values", "icon": null},
-          {"label": "Good Communication", "icon": null},
+          {"label": "Good Communication", "icon": AppAssets.chat},
           {"label": "26-32 years", "icon": null},
           {"label": "5'7\" and above", "icon": null},
         ],
@@ -151,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
       {
         "title": "Vision for Marriage",
         "items": [
-          {"label": "Christ-Centered Home", "icon": null},
+          {"label": "Christ-Centered Home", "icon": AppAssets.home},
           {"label": "Support Dreams & Serve", "icon": null},
           {"label": "Family Legacy", "icon": null},
           {"label": "Definitely Want Kids", "icon": null},
@@ -379,10 +379,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Positioned(
                 top: 20,
-                right: 20,
+                right: 16,
                 child: _buildBadge(
                   context,
-                  iconPath: AppAssets.whiteHeart,
+                  iconPath: AppAssets.heart,
                   text: "Verified",
                   color: const Color(0xFF3B82F6), // Blue
                 ),
