@@ -177,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     // 1. Profile Image Section
                     _buildProfileImageCard(context),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 22),
 
                     // 3. Details Card (Wrapper for all sections)
                     Container(
