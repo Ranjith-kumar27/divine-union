@@ -42,6 +42,24 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     });
   }
 
+  bool get _hasActiveFilters {
+    bool rangesChanged =
+        _ageRange != const RangeValues(18, 60) ||
+        _heightRange != const RangeValues(4.0, 7.0);
+
+    return rangesChanged ||
+        _maritalStatus.isNotEmpty ||
+        _location.isNotEmpty ||
+        _denomination.isNotEmpty ||
+        _churchAttendance.isNotEmpty ||
+        _educationLevel.isNotEmpty ||
+        _diet.isNotEmpty ||
+        _drinking.isNotEmpty ||
+        _smoking.isNotEmpty ||
+        _languages.isNotEmpty ||
+        _familyType.isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -55,7 +73,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           _buildHeader(context),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               child: Column(
                 children: [
                   _buildSection(
@@ -89,7 +107,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
       child: Row(
         children: [
           Column(
@@ -158,8 +176,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   Text(
                     title,
                     style: AppTextStyles.subheading(context).copyWith(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                       color: isExpanded
                           ? AppColors.primary
                           : const Color(0xFF374151),
@@ -208,7 +226,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           min: 4.0,
           max: 7.0,
           label:
-              '${_ageRange.start.toStringAsFixed(1)}" - ${_ageRange.end.toStringAsFixed(1)}"', // Dummy label logic
+              '${_heightRange.start.toStringAsFixed(1)}" - ${_heightRange.end.toStringAsFixed(1)}"',
           onChanged: (v) => setState(() => _heightRange = v),
         ),
         const SizedBox(height: 24),
@@ -392,7 +410,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             ),
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary,
@@ -477,7 +495,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   Widget _buildBottomBar(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Colors.grey.shade200)),
@@ -510,9 +528,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               onPressed: () => Navigator.pop(context, _calculateActiveCount()),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: const Color(
-                  0xFFA5A6F6,
-                ), // Light purple from design
+                backgroundColor: _hasActiveFilters
+                    ? AppColors.primary
+                    : const Color(0xFFA5A6F6),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -572,7 +590,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     count += _smoking.length;
     count += _languages.length;
     count += _familyType.length;
-    // Basic check if sliders are modified from extremes (optional, skipping for now to match "filters count" usually meaning discrete selections)
+
+    if (_ageRange != const RangeValues(18, 60)) count++;
+    if (_heightRange != const RangeValues(4.0, 7.0)) count++;
+
     return count;
   }
 }
