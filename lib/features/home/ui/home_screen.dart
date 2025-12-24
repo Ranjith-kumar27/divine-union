@@ -427,13 +427,39 @@ class _HomeScreenState extends State<HomeScreen> {
               Positioned(
                 top: 20,
                 right: 16,
-                child: _buildBadge(
-                  context,
-                  iconPath: AppAssets.heart,
-                  text: "Verified",
-                  color: const Color(0xFF3B82F6), // Blue
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.verified, color: Colors.white, size: 18),
+                      SizedBox(width: 6),
+                      Text(
+                        'Verified',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              // _buildBadge(
+              //   context,
+              //   iconPath: AppAssets.heart,
+              //   text: "Verified",
+              //   color: const Color(0xFF3B82F6), // Blue
+              // ),
+              // ),
               // Name and Details
               Positioned(
                 bottom: 24,
