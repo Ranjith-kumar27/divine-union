@@ -12,56 +12,88 @@ class PerfectMatchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Proportional font sizes based on screenHeight
     final headingStyle = AppTextStyles.heading(context).copyWith(
-      fontSize: 32,
+      fontSize: (screenHeight * 0.038).clamp(24.0, 32.0),
       fontWeight: FontWeight.w700,
       color: Colors.white,
     );
 
     final subTextStyle = AppTextStyles.body(context).copyWith(
-      fontSize: 16,
+      fontSize: (screenHeight * 0.019).clamp(14.0, 16.0),
       color: Colors.white.withOpacity(0.85),
       height: 1.5,
     );
 
     final buttonTextPrimary = AppTextStyles.buttonLabel(context).copyWith(
-      fontSize: 16,
+      fontSize: (screenHeight * 0.019).clamp(14.0, 16.0),
       fontWeight: FontWeight.w600,
     );
 
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 80),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18.0,
+                    vertical: 18.0,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: screenHeight * 0.08),
 
-              Text('Find Your Perfect Match',
-                  style: headingStyle, textAlign: TextAlign.center),
+                        Text(
+                          'Find Your Perfect Match',
+                          style: headingStyle,
+                          textAlign: TextAlign.center,
+                        ),
 
-              const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-              Text(
-                'Find your perfect match and begin a beautiful journey together',
-                style: subTextStyle,
-                textAlign: TextAlign.center,
+                        Text(
+                          'Find your perfect match and begin a beautiful journey together',
+                          style: subTextStyle,
+                          textAlign: TextAlign.center,
+                        ),
+
+                        SizedBox(height: screenHeight * 0.04),
+
+                        Flexible(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxHeight: screenHeight * 0.4,
+                            ),
+                            child: SvgPicture.asset(
+                              AppAssets.couple,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+                        _buildPrimaryButton(context, buttonTextPrimary),
+                        const SizedBox(height: 16),
+                        _buildOutlineButton(context, buttonTextPrimary),
+
+                        SizedBox(
+                          height: (screenHeight * 0.05).clamp(20.0, 40.0),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-
-              const SizedBox(height: 40),
-              SvgPicture.asset(AppAssets.couple),
-
-              const Spacer(),
-
-              _buildPrimaryButton(context, buttonTextPrimary),
-              const SizedBox(height: 16),
-              _buildOutlineButton(context, buttonTextPrimary),
-
-              const SizedBox(height: 40),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -81,7 +113,10 @@ class PerfectMatchScreen extends StatelessWidget {
           ),
           elevation: 0,
         ),
-        child: Text('Get Started', style: style.copyWith(color: AppColors.primary)),
+        child: Text(
+          'Get Started',
+          style: style.copyWith(color: AppColors.primary),
+        ),
       ),
     );
   }

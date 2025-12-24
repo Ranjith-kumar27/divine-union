@@ -329,7 +329,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.w400,
                                     color: isSelected
-                                        ? AppColors.textPrimary
+                                        ? AppColors.primary
                                         : AppColors.textSecondary,
                                   ),
                                 ),
