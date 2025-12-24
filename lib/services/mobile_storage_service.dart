@@ -54,4 +54,13 @@ class MobileStorageService {
       print('Error clearing mobile: $e');
     }
   }
+
+  static Future<void> clearAllData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+    } catch (e) {
+      print('Error clearing all data: $e');
+    }
+  }
 }

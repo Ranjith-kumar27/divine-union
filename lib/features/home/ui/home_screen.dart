@@ -6,7 +6,9 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../routes.dart';
 import 'widgets/filter_bottom_sheet.dart';
+import '../../../services/mobile_storage_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -313,65 +315,106 @@ class _HomeScreenState extends State<HomeScreen> {
             AppStrings.matchingProfiles,
             style: AppTextStyles.heading(context),
           ),
-          SizedBox(
-            width: AppSizes.iconButtonSize,
-            height: AppSizes.iconButtonSize,
-            child: IconButton(
-              padding: EdgeInsets.zero,
-              onPressed: () async {
-                final result = await showModalBottomSheet<int>(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => const FilterBottomSheet(),
-                );
-
-                if (result != null) {
-                  setState(() {
-                    _activeFilters = result;
-                  });
-                }
-              },
-              icon: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  SvgPicture.asset(
-                    AppAssets.settings,
-                    width: AppSizes.iconSizeMedium,
-                    colorFilter: const ColorFilter.mode(
-                      AppColors.textPrimary,
-                      BlendMode.srcIn,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () async {
+                  final bool? confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Logout'),
+                      content: const Text('Are you sure you want to logout?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: const Text('Logout'),
+                        ),
+                      ],
                     ),
-                  ),
-                  if (_activeFilters > 0)
-                    Positioned(
-                      right: -4,
-                      top: -8,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
+                  );
+
+                  if (confirm == true) {
+                    await MobileStorageService.clearAllData();
+
+                    if (!mounted) return;
+
+                    Navigator.of(context).pushReplacementNamed(
+                      Routes.mobileNumber,
+                    );
+                  }
+                },
+                icon: const Icon(
+                  Icons.logout,
+                  color: Colors.redAccent,
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: AppSizes.iconButtonSize,
+                height: AppSizes.iconButtonSize,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () async {
+                    final result = await showModalBottomSheet<int>(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => const FilterBottomSheet(),
+                    );
+
+                    if (result != null) {
+                      setState(() {
+                        _activeFilters = result;
+                      });
+                    }
+                  },
+                  icon: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      SvgPicture.asset(
+                        AppAssets.settings,
+                        width: AppSizes.iconSizeMedium,
+                        colorFilter: const ColorFilter.mode(
+                          AppColors.textPrimary,
+                          BlendMode.srcIn,
                         ),
-                        constraints: const BoxConstraints(
-                          minWidth: 18,
-                          minHeight: 18,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '$_activeFilters',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                      ),
+                      if (_activeFilters > 0)
+                        Positioned(
+                          right: -4,
+                          top: -8,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 18,
+                              minHeight: 18,
+                            ),
+                            child: Center(
+                              child: Text(
+                                '$_activeFilters',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                ],
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),
