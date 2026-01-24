@@ -1,9 +1,11 @@
-import 'package:divineunion_matrimony/services/verification_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'core/constants/app_colors.dart';
 import 'features/registration/bloc/registration_bloc.dart';
 import 'features/registration/data/auth_repository.dart';
+import 'features/registration/data/master_data_repository.dart';
+import 'services/verification_storage_service.dart';
 import 'routes.dart';
 
 void main() async {
@@ -25,11 +27,14 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<RegistrationBloc>(
-          create: (context) => RegistrationBloc(ApiAuthRepository()),
+          create: (context) => RegistrationBloc(
+            repo: ApiAuthRepository(),
+            masterDataRepo: MasterDataRepository(),
+          ),
         ),
       ],
       child: MaterialApp(
-        title: 'Your App',
+        title: 'Divine Union',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,

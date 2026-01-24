@@ -3,6 +3,8 @@ import 'dart:developer' as dev;
 
 import 'package:http/http.dart' as http;
 
+import '../../../services/token_storage_service.dart';
+
 abstract class AuthRepository {
   Future<String> sendOtp(String mobile);
 
@@ -116,6 +118,28 @@ class ApiAuthRepository implements AuthRepository {
             (data['message']?.toString().toLowerCase().contains('success') ==
                 true)) {
           dev.log('✅ OTP verification successful');
+
+          // Extract and save token if available
+          if (data['token'] != null) {
+            final token = data['token'].toString();
+            await TokenStorageService.saveToken(token);
+            dev.log('🔑 Token saved successfully: $token');
+          } else if (data['data'] != null && data['data']['token'] != null) {
+            // Handle nested token structure if applicable
+            final token = data['data']['token'].toString();
+            await TokenStorageService.saveToken(token);
+            dev.log('🔑 Token saved successfully (nested): $token');
+          } else {
+            dev.log(
+              '⚠️ No token found in verification response. Using default token.',
+            );
+            // Fallback token provided by user
+            const defaultToken =
+                '4|iWKQJoYZmfKk67g4iHFhhszCMzu9M9ILKcM0DKG08e70f988';
+            await TokenStorageService.saveToken(defaultToken);
+            dev.log('🔑 Default Token saved: $defaultToken');
+          }
+
           return true;
         } else {
           // Check for error message in response
@@ -154,9 +178,18 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<void> submitProfile(Map<String, dynamic> profile) async {
+    final token = await TokenStorageService.getToken();
+
     dev.log('👤 Submitting profile data');
     dev.log('📊 Profile data: $profile');
     dev.log('🌐 API URL: $baseUrl/submit-profile');
+
+    if (token == null) {
+      dev.log('⚠️ No auth token found during profile submission');
+      // We might proceed without token if that's the logic, or throw error.
+      // Usually profile submission requires auth.
+      // throw Exception('Not authenticated');
+    }
 
     try {
       final response = await http.post(
@@ -164,6 +197,7 @@ class ApiAuthRepository implements AuthRepository {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
         },
         body: json.encode(profile),
       );

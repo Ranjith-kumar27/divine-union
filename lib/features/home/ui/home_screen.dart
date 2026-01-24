@@ -344,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (!mounted) return;
 
                     Navigator.of(context).pushReplacementNamed(
-                      Routes.mobileNumber,
+                      Routes.perfectMatch,
                     );
                   }
                 },

@@ -3,13 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../services/mobile_storage_service.dart';
 import '../../../services/verification_storage_service.dart';
 import '../data/auth_repository.dart';
+import '../data/master_data_repository.dart';
 import 'registration_event.dart';
 import 'registration_state.dart';
 
 class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   final AuthRepository repo;
+  final MasterDataRepository masterDataRepo;
 
-  RegistrationBloc(this.repo) : super(const RegistrationState()) {
+  RegistrationBloc({required this.repo, required this.masterDataRepo})
+    : super(const RegistrationState()) {
     on<MobileSubmitted>(_onMobileSubmitted);
     on<OtpSubmitted>(_onOtpSubmitted);
     on<ResendOtp>(_onResendOtp);
@@ -17,6 +20,38 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     on<PersonalDetailsUpdated>(_onPersonalDetailsUpdated);
     on<ReligionAnswerUpdated>(_onReligionAnswerUpdated);
     on<SubmitRegistration>(_onSubmitRegistration);
+    on<LoadMasterData>(_onLoadMasterData);
+  }
+
+  Future<void> _onLoadMasterData(
+    LoadMasterData event,
+    Emitter<RegistrationState> emit,
+  ) async {
+    emit(state.copyWith(isLoadingMasterData: true, masterDataError: null));
+
+    try {
+      final masterData = await masterDataRepo.getMasterData();
+      emit(
+        state.copyWith(
+          isLoadingMasterData: false,
+          states: masterData.states,
+          cities: masterData.cities,
+          genders: masterData.genders,
+          maritalStatuses: masterData.maritalStatuses,
+          motherTongues: masterData.motherTongues,
+          knownLanguages: masterData.knownLanguages,
+          heights: masterData.heights,
+          weights: masterData.weights,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isLoadingMasterData: false,
+          masterDataError: e.toString(),
+        ),
+      );
+    }
   }
 
   Future<void> _onMobileSubmitted(
@@ -136,9 +171,9 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
   }
 
   Future<void> _onSubmitRegistration(
-      SubmitRegistration event,
-      Emitter<RegistrationState> emit,
-      ) async {
+    SubmitRegistration event,
+    Emitter<RegistrationState> emit,
+  ) async {
     emit(state.copyWith(status: RegistrationStatus.loading, error: null));
 
     try {

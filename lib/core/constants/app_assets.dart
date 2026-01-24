@@ -7,7 +7,7 @@ class AppAssets {
   static const String arrowDown = 'assets/icons/arrow-down.svg';
   static const String male = 'assets/icons/male.svg';
   static const String female = 'assets/icons/female.svg';
-  static const String logo = 'assets/images/logo.png';
+  static const String logo = 'assets/images/person.png';
   static const String couple = 'assets/icons/couple.svg';
   static const String settings = 'assets/icons/settings.svg';
   static const String cancel = 'assets/icons/cancel.svg';

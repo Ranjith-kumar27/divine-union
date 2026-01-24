@@ -63,3 +63,5 @@ class ReligionAnswerUpdated extends RegistrationEvent {
 }
 
 class SubmitRegistration extends RegistrationEvent {}
+
+class LoadMasterData extends RegistrationEvent {}

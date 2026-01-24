@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
       );
     } else {
       // User not verified, go to mobile number screen
-      Navigator.of(context).pushReplacementNamed(Routes.mobileNumber);
+      Navigator.of(context).pushReplacementNamed(Routes.perfectMatch);
     }
   }
 
